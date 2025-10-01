@@ -8,10 +8,10 @@
 
 ### Pertemuan 1
 
-- Materi: Pengenalan Pemrograman Mobile dan React Native
-- OBE Outcome: Mahasiswa memahami posisi pemrograman mobile dalam industri dan dasar-dasar React Native.
-- Aktivitas: Diskusi konsep mobile apps, instalasi Node.js dan React Native CLI, demonstrasi hello world.
-- Asesmen: Kuis + praktik setup environment.
+- - Materi: Pengenalan Pemrograman Mobile dan React Native
+- - OBE Outcome: Mahasiswa memahami posisi pemrograman mobile dalam industri dan dasar-dasar React Native.
+- - Aktivitas: Diskusi konsep mobile apps, instalasi Node.js dan React Native CLI, demonstrasi hello world.
+- - Asesmen: Kuis + praktik setup environment.
 - Slides :
   - https://fast-ibbi.github.io/kamis-vii-p1/git
   - https://fast-ibbi.github.io/kamis-vii-p1/emmet
@@ -20,105 +20,105 @@
 
 ### Pertemuan 2
 
-- Materi: Struktur Proyek React Native dan Komponen Dasar
-- OBE Outcome: Mahasiswa mengenal struktur folder, lifecycle komponen, dan penggunaan komponen dasar.
-- Aktivitas: Review kode starter, latihan membuat komponen sederhana.
-- Asesmen: Tugas individu membuat layout sederhana.
+- Materi: Pengenalan JavaScript ES6
+- OBE Outcome: Mahasiswa memahami fitur modern JavaScript (arrow function, let/const, destructuring, async/await) sebagai dasar pengembangan React Native.
+- Aktivitas: Latihan sintaks ES6, hands-on pemrograman dasar.
+- Asesmen: Kuis + latihan coding ES6.
 
 ### Pertemuan 3
 
-- Materi: Styling dalam React Native (Flexbox dan StyleSheet)
-- OBE Outcome: Mahasiswa mampu menggunakan styling modern dengan Flexbox untuk desain antarmuka.
-- Aktivitas: Eksperimen desain tampilan dengan Flexbox.
-- Asesmen: Praktik membuat layout responsif sederhana.
+- Materi: Pengenalan React (Komponen & JSX)
+- OBE Outcome: Mahasiswa memahami konsep component-based development dan JSX sebagai pondasi React Native.
+- Aktivitas: Latihan membuat komponen sederhana dengan JSX.
+- Asesmen: Tugas membuat halaman statis dengan JSX.
 
 ### Pertemuan 4
 
-- Materi: Navigasi pada React Native (Stack, Tab, Drawer)
-- OBE Outcome: Mahasiswa memahami penggunaan React Navigation untuk variasi navigasi aplikasi.
-- Aktivitas: Implementasi aplikasi multi-screen sederhana.
-- Asesmen: Kuis + mini project navigasi aplikasi.
+- Materi: Struktur Proyek React Native dan Komponen Dasar
+- OBE Outcome: Mahasiswa mengenal struktur project RN serta penggunaan komponen dasar (Text, View, Image, Button).
+- Aktivitas: Membongkar kode starter, contoh implementasi.
+- Asesmen: Tugas layout sederhana.
 
 ### Pertemuan 5
 
-- Materi: State dan Props dalam React Native
-- OBE Outcome: Mahasiswa mampu mengelola data antar komponen menggunakan state dan props.
-- Aktivitas: Latihan membuat form sederhana dengan props dan state.
-- Asesmen: Praktik membuat input form dengan validasi dasar.
+- Materi: Styling dalam React Native (Flexbox & StyleSheet)
+- OBE Outcome: Mahasiswa mampu mengatur tata letak responsif.
+- Aktivitas: Eksperimen desain tampilan dengan Flexbox.
+- Asesmen: Praktik layout responsif sederhana.
 
 ### Pertemuan 6
 
-- Materi: Handling Event, Input, dan Form Validation
-- OBE Outcome: Mahasiswa mampu menangani interaksi pengguna (input, event handler, validasi form).
-- Aktivitas: Latihan interaktif, coding bersama.
-- Asesmen: Tugas membuat halaman login dengan validasi input.
+- Materi: Navigasi pada React Native (Stack, Tab, Drawer)
+- OBE Outcome: Mahasiswa memahami penggunaan React Navigation.
+- Aktivitas: Praktek multi-screen apps.
+- Asesmen: Mini project navigasi.
 
 ### Pertemuan 7
 
-- Materi: Data Fetching & Konsumsi API (REST API)
-- OBE Outcome: Mahasiswa mampu mengintegrasikan API eksternal menggunakan fetch/axios.
-- Aktivitas: Praktik mengambil data dari API publik dan menampilkan di aplikasi.
-- Asesmen: Mini project aplikasi berita sederhana.
+- Materi: State dan Props dalam React Native
+- OBE Outcome: Mahasiswa dapat mengelola data antar komponen dengan state dan props.
+- Aktivitas: Latihan membuat form interaktif.
+- Asesmen: Praktik input form dengan validasi dasar.
 
 ### Pertemuan 8
 
 - Materi: Ujian Tengah Semester (UTS)
-- OBE Outcome: Mahasiswa mampu mengimplementasikan konsep yang telah dipelajari secara terintegrasi.
-- Aktivitas: UTS teori dan praktik.
-- Asesmen: Ujian tertulis + praktik coding.
+- OBE Outcome: Evaluasi pemahaman mahasiswa materi awal.
+- Aktivitas: Ujian teori + praktik.
+- Asesmen: UTS.
 
 ### Pertemuan 9
 
-- Materi: Redux/Context API untuk State Management
-- OBE Outcome: Mahasiswa menguasai state management global menggunakan Redux atau Context API.
-- Aktivitas: Implementasi aplikasi dengan global state (misalnya todo list).
-- Asesmen: Mini project + kuis konsep state management.
+- Materi: Handling Event, Input, dan Form Validation
+- OBE Outcome: Mahasiswa mampu menangani interaksi user dan validasi input.
+- Aktivitas: Coding praktis.
+- Asesmen: Tugas halaman login dengan validasi.
 
 ### Pertemuan 10
 
-- Materi: Integrasi Database Lokal (AsyncStorage / SQLite)
-- OBE Outcome: Mahasiswa mampu menyimpan data secara lokal dalam aplikasi mobile.
-- Aktivitas: Praktek implementasi penyimpanan data.
-- Asesmen: Tugas membuat aplikasi catatan sederhana dengan penyimpanan lokal.
+- Materi: Data Fetching & Konsumsi API (REST API)
+- OBE Outcome: Mahasiswa mampu mengintegrasikan API eksternal.
+- Aktivitas: Demo fetch data API publik.
+- Asesmen: Mini project aplikasi berita.
 
 ### Pertemuan 11
 
-- Materi: Integrasi Firebase (Auth, Firestore)
-- OBE Outcome: Mahasiswa mampu mengembangkan aplikasi dengan Firebase untuk autentikasi dan backend ringan.
-- Aktivitas: Demonstrasi setup Firebase, hands-on autentikasi dengan Google.
-- Asesmen: Praktik autentikasi akun dan CRUD data di Firestore.
+- Materi: State Management dengan Redux/Context API
+- OBE Outcome: Mahasiswa memahami manajemen state global.
+- Aktivitas: Latihan membuat todo list dengan Redux/Context.
+- Asesmen: Mini project state management.
 
 ### Pertemuan 12
 
-- Materi: Multimedia dan Device API (Camera, Location, Notification)
-- OBE Outcome: Mahasiswa mampu memanfaatkan fitur perangkat dalam aplikasi React Native.
-- Aktivitas: Latihan integrasi kamera dan lokasi.
-- Asesmen: Tugas kecil menggunakan kamera/lokasi.
+- Materi: Database Lokal (AsyncStorage / SQLite)
+- OBE Outcome: Mahasiswa mampu menyimpan data secara lokal.
+- Aktivitas: Implementasi aplikasi catatan menggunakan AsyncStorage/SQLite.
+- Asesmen: Tugas aplikasi catatan sederhana.
 
 ### Pertemuan 13
 
-- Materi: Deployment Aplikasi ke Android dan iOS
-- OBE Outcome: Mahasiswa memahami proses build aplikasi hingga siap rilis di Play Store/App Store.
-- Aktivitas: Demonstrasi proses build dan signing aplikasi.
-- Asesmen: Kuis teoritis tentang deployment.
+- Materi: Multimedia dan Device API (Camera, Location, Notification)
+- OBE Outcome: Mahasiswa mampu memanfaatkan device API dalam pengembangan.
+- Aktivitas: Demo kamera, lokasi, notifikasi.
+- Asesmen: Tugas kecil integrasi kamera/lokasi.
 
 ### Pertemuan 14
 
 - Materi: Optimasi Kinerja dan Debugging
-- OBE Outcome: Mahasiswa mampu melakukan optimasi aplikasi dan debugging dengan tools bawaan React Native.
-- Aktivitas: Eksperimen debugging, analisis performa aplikasi.
-- Asesmen: Praktik menemukan bug dan optimasi aplikasi.
+- OBE Outcome: Mahasiswa mampu melakukan optimasi dan debugging aplikasi RN.
+- Aktivitas: Praktik debugging dengan React Native Debugger, performance profiling.
+- Asesmen: Praktik menemukan & memperbaiki bug.
 
 ### Pertemuan 15
 
 - Materi: Proyek Akhir (Project Development & Review)
-- OBE Outcome: Mahasiswa mampu mengembangkan aplikasi mobile sederhana berbasis React Native yang terintegrasi dengan API eksternal atau database.
-- Aktivitas: Presentasi progres proyek final, bimbingan proyek.
-- Asesmen: Penilaian progres proyek akhir.
+- OBE Outcome: Mahasiswa mengintegrasikan seluruh materi ke dalam aplikasi nyata.
+- Aktivitas: Presentasi progress, review project.
+- Asesmen: Penilaian project berjalan.
 
 ### Pertemuan 16
 
 - Materi: Ujian Akhir Semester (UAS)
-- OBE Outcome: Mahasiswa menunjukkan kemampuan pengembangan aplikasi mobile secara komprehensif.
-- Aktivitas: UAS praktik pengembangan aplikasi.
-- Asesmen: UAS berbasis project aplikasi mobile.
+- OBE Outcome: Mahasiswa mengembangkan aplikasi komprehensif berbasis React Native.
+- Aktivitas: UAS berbasis praktik coding.
+- Asesmen: Proyek aplikasi mobile.
