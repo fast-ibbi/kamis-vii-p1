@@ -26,37 +26,36 @@ _paginate: skip
 
 ---
 
-## Kenapa ES6 Penting?
-
-- JavaScript lama punya keterbatasan untuk pengembangan modern.
-- ES6 mengoptimalkan penulisan kode dan meningkatkan performa.
-- Memecahkan masalah seperti hoisting, callback hell, dan scope confusion.
-- Memberikan sintaks yang lebih ekspresif dan mudah dibaca.
-- Standar industri untuk development web dan aplikasi JavaScript modern.
-
----
-
 ## Let & Const (Variabel Baru)
 
 - `var` punya scope fungsi dan bisa dideklarasi ulang.
 - `let` punya block scope dan tidak bisa dideklarasi ulang.
 - `const` untuk nilai konstan tetap, juga block scope.
-- Mengatasi masalah hoisting yang membingungkan di `var`.
+
+---
+
+## Template Literals
+
+- String dengan backticks (`) untuk interpolasi.
+- Bisa menyisipkan ekspresi dengan `${}`.
+- Mendukung multi-line string.
 
 ---
 
 Contoh:
 
 ```js
-let x = 10;
-const y = 20;
-// y = 30; // Error: Assignment to constant variable.
+const nama = "Andi";
+const umur = 25;
+console.log(`Halo, ${nama}! Umur: ${umur}`);
 
-// Hoisting behavior
-console.log(varVariable); // undefined (hoisted)
-// console.log(letVariable); // ReferenceError
-var varVariable = "var value";
-let letVariable = "let value";
+// Multi-line string
+const html = `
+  <div>
+    <h1>${nama}</h1>
+    <p>Umur: ${umur} tahun</p>
+  </div>
+`;
 ```
 
 ---
@@ -87,29 +86,93 @@ const kaliArrow = (a, b) => a * b;
 
 ---
 
-## Template Literals
+## Higher-order Functions (HOF)
 
-- String dengan backticks (`) untuk interpolasi.
-- Bisa menyisipkan ekspresi dengan `${}`.
-- Mendukung multi-line string.
+- Fungsi yang menerima fungsi lain sebagai argumen atau mengembalikan fungsi.
+- Banyak digunakan untuk memproses array secara deklaratif.
 
 ---
+
+## Array.prototype.map()
+
+- Menghasilkan array baru dengan hasil pemanggilan fungsi pada setiap elemen.
+- Tidak mengubah array asli (pure for arrays of primitives/objects reference remains).
 
 Contoh:
 
 ```js
-const nama = "Andi";
-const umur = 25;
-console.log(`Halo, ${nama}! Umur: ${umur}`);
-
-// Multi-line string
-const html = `
-  <div>
-    <h1>${nama}</h1>
-    <p>Umur: ${umur} tahun</p>
-  </div>
-`;
+const nums = [1, 2, 3, 4];
+const doubled = nums.map((n) => n * 2);
+console.log(doubled); // [2, 4, 6, 8]
 ```
+
+---
+
+## Array.prototype.filter()
+
+- Menghasilkan array baru berisi elemen yang lolos predikat (fungsi yang mengembalikan boolean).
+
+Contoh:
+
+```js
+const values = [5, 10, 15, 20];
+const big = values.filter((v) => v >= 15);
+console.log(big); // [15, 20]
+```
+
+---
+
+## Array.prototype.reduce()
+
+- Menggabungkan semua elemen array menjadi satu nilai menggunakan fungsi accumulator.
+- Sangat berguna untuk sum, group-by, atau membangun struktur baru.
+
+Contoh (sum):
+
+```js
+const arr = [1, 2, 3, 4];
+const sum = arr.reduce((acc, val) => acc + val, 0);
+console.log(sum); // 10
+```
+
+Contoh (group by):
+
+```js
+const names = ["alice", "bob", "alice"];
+const counts = names.reduce((acc, name) => {
+  acc[name] = (acc[name] || 0) + 1;
+  return acc;
+}, {});
+console.log(counts); // { alice: 2, bob: 1 }
+```
+
+---
+
+## forEach, find, some, every
+
+- forEach: iterasi tanpa mengembalikan array (side-effects).
+- find: mengembalikan elemen pertama yang cocok.
+- some: apakah setidaknya satu elemen lolos predikat (boolean).
+- every: apakah semua elemen lolos predikat (boolean).
+
+Contoh singkat:
+
+```js
+const items = [1, 2, 3, 4];
+items.forEach((x) => console.log(x));
+const firstEven = items.find((x) => x % 2 === 0);
+console.log(firstEven); // 2
+console.log(items.some((x) => x > 3)); // true
+console.log(items.every((x) => x > 0)); // true
+```
+
+---
+
+## Tips & chaining
+
+- Banyak HOF dapat dirangkai: `arr.map(...).filter(...).reduce(...)`.
+- Prefer immutability: gunakan hasil yang dikembalikan, jangan ubah input langsung.
+- Gunakan nama fungsi/predicate yang jelas untuk readability.
 
 ---
 
@@ -266,11 +329,3 @@ export const pi = 3.14;
 import { pi } from "./module.js";
 console.log(pi);
 ```
-
----
-
-## Ringkasan dan Penugasan
-
-- Rekap fitur penting ES6.
-- Latihan membuat kode menggunakan fitur ES6.
-- Kesempatan tanya jawab.
