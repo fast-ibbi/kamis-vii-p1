@@ -89,43 +89,4 @@
   console.log(mul3(5)); // 15
   ```
 
----
 
-## Jawaban (opsional)
-
-6. Map — solusi singkat:
-
-```js
-const names = products.map((p) => p.name);
-```
-
-7. Filter — solusi singkat:
-
-```js
-const evens = [3, 8, 12, 5, 20].filter((n) => n % 2 === 0);
-```
-
-8. Reduce — solusi singkat:
-
-```js
-const sum = [10, 5, 8, 20, 3].reduce((a, b) => a + b, 0);
-const max = [10, 5, 8, 20, 3].reduce((a, b) => (a > b ? a : b), -Infinity);
-```
-
-9. Kombinasi:
-
-```js
-const availableUpper = store
-  .filter((item) => item.stock > 0)
-  .map((item) => item.name.toUpperCase());
-```
-
-10. makeMultiplier:
-
-```js
-function makeMultiplier(n) {
-  return function (x) {
-    return x * n;
-  };
-}
-```
