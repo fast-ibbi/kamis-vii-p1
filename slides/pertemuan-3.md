@@ -89,6 +89,42 @@ Dengan JSX, variabel JavaScript dapat langsung digunakan dalam markup menggunaka
 
 ---
 
+## Memulai Project React (CDN)
+
+CDN Links
+
+```HTML
+<!-- React and ReactDOM via CDN -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+<!-- Babel for JSX support in the browser -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+```
+
+---
+
+Kode React
+
+```HTML
+<div id="root"></div>
+<!-- Your React code -->
+<script type="text/babel">
+    function App() {
+        return (
+            <div>
+                <h1>Hello React (via CDN) 👋</h1>
+            </div>
+        );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+</script>
+```
+
+---
+
 ## **Functional Component**
 
 Functional component adalah fungsi JavaScript yang mengembalikan JSX. Ini adalah cara paling sederhana dan modern untuk membuat komponen React.[5]
