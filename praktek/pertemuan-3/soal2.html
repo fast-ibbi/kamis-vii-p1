@@ -1,0 +1,41 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soal 1</title>
+    <!-- React and ReactDOM via CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- Babel for JSX support in the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <!-- Your React code -->
+    <script type="text/babel">
+        const ProfileCard = ({ name, age, hobby }) => {
+            return (
+                <div>
+                    <h2>Name : {name}</h2>
+                    <p>Age: {age} years old</p>
+                    <p>Hobby: {hobby}</p>
+                </div>
+            );
+        };
+
+        function App() {
+            return (
+                <div>
+                    <ProfileCard name="Alice" age={25} hobby="Reading" />
+                    <ProfileCard name="Bob" age={30} hobby="Cycling" />
+                    <ProfileCard name="Charlie" age={28} hobby="Hiking" />
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(<App />);
+    </script>
+</body>
+</html>

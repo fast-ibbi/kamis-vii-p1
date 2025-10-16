@@ -1,0 +1,42 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soal 1</title>
+    <!-- React and ReactDOM via CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- Babel for JSX support in the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <!-- Your React code -->
+    <script type="text/babel">
+        function AlertButton({ label, message }) {
+            return (
+                <button onClick={() => alert(message)}>
+                    {label}
+                </button>
+            )
+        }
+        
+        function App() {
+            return (
+                <div>
+                    <AlertButton label="Click Me" 
+                        message="Hello, World!" />
+                    <AlertButton label="Hello" 
+                        message="Halloooo" />
+                    <AlertButton label="Selamat Datang" 
+                        message="Selamat datang ke Konoha" />
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(<App />);
+    </script>
+</body>
+</html>
