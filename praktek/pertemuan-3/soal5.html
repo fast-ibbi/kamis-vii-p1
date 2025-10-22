@@ -1,4 +1,5 @@
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,13 +11,14 @@
     <!-- Babel for JSX support in the browser -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
+
 <body>
     <div id="root"></div>
     <!-- Your React code -->
     <script type="text/babel">
         const { useState } = React;
 
-        function ToggleText({message}){
+        function ToggleText({ message }) {
             const [tampil, setTampil] = useState(false);
 
 
@@ -25,17 +27,13 @@
                 <div>
                     <button onClick={() => setTampil(!tampil)}>
                         {tampil ? "Sembunyikan Pesan" : "Tampilkan Pesan"}
-                        /* if(tampil == true){
-                            "Sembunyikan Pesan"
-                        } else {
-                            "Tampilkan Pesan"
-                        } */
                     </button>
-                    {tampil && <p>{message}</p>}
-                    /* if(tampil == true){
+                    {tampil ? (
                         <p>{message}</p>
-                    }*/
-                 </div>
+                    ) : (
+                        <p>Tidak ada pesan.</p>
+                    )}
+                </div>
             );
         }
 
@@ -51,4 +49,5 @@
         root.render(<App />);
     </script>
 </body>
+
 </html>
