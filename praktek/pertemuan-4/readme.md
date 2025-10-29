@@ -1,377 +1,424 @@
-# Latihan Praktek - Pertemuan 4: Struktur Proyek React Native dan Komponen Dasar
+# Soal Latihan Praktek - Pertemuan 4
 
-## Petunjuk Umum
-
-- Buatlah project React Native baru menggunakan Expo
-- Gunakan Expo Go di smartphone untuk testing
-- Setiap soal dibuat sebagai komponen atau screen terpisah
-- Pastikan kode berjalan tanpa error di device
-- Perhatikan struktur folder dan penamaan component
+## Struktur Proyek React Native dan Komponen Dasar
 
 ---
 
-## Soal 1: Setup Project dan Hello World
+## Soal 1: Membuat Component Sederhana dengan View dan Text
 
-**Tingkat: Mudah**
+Buatlah sebuah aplikasi React Native sederhana yang menampilkan profil pribadi Anda menggunakan komponen `View` dan `Text`.
 
-Buatlah project Expo baru dengan nama "MyFirstApp" dan modifikasi App.js untuk menampilkan:
+**Kriteria:**
 
-- Text "Hello React Native!"
-- Text "Nama: [Nama Anda]"
-- Text "NIM: [NIM Anda]"
-- Gunakan styling yang rapi (centered, font size berbeda)
+- Gunakan komponen `View` sebagai container utama
+- Tampilkan informasi berikut menggunakan komponen `Text`:
+  - Nama lengkap
+  - NIM/NPM
+  - Jurusan
+  - Email
+  - Hobi (minimal 3)
+- Setiap informasi harus dalam `View` terpisah
+- Tidak perlu styling, fokus pada struktur component
 
-**Langkah:**
+**Contoh Output:**
 
-```bash
-npx create-expo-app MyFirstApp
-cd MyFirstApp
-npm start
 ```
-
-**Hints:**
-
-- Gunakan View sebagai container
-- Gunakan Text untuk menampilkan teks
-- Gunakan StyleSheet untuk styling
+Nama: John Doe
+NIM: 123456789
+Jurusan: Teknik Informatika
+Email: john@example.com
+Hobi:
+- Membaca
+- Coding
+- Gaming
+```
 
 ---
 
-## Soal 2: Profile Card dengan Image
+## Soal 2: Bekerja dengan Image Component
 
-**Tingkat: Mudah**
+Buatlah aplikasi yang menampilkan gallery sederhana menggunakan komponen `Image`.
 
-Buatlah komponen `ProfileCard` yang menampilkan:
+**Kriteria:**
 
-- Avatar/foto profile (gunakan gambar dari URL atau local)
-- Nama lengkap
-- Status/bio singkat
-- Email
+- Gunakan `ScrollView` sebagai container utama
+- Tampilkan minimal 5 gambar
+- Gunakan gambar dari URL (https://picsum.photos/)
+- Setiap gambar harus memiliki ukuran yang sama
+- Tampilkan caption/deskripsi di bawah setiap gambar menggunakan `Text`
+- Tidak perlu styling
 
-Gunakan styling yang menarik dengan border, padding, dan background color.
-
-**Contoh struktur:**
-
-```
-┌─────────────────────┐
-│   [Avatar Image]    │
-│   Nama Lengkap      │
-│   Software Engineer │
-│   email@example.com │
-└─────────────────────┘
-```
-
-**Hints:**
-
-- Gunakan Image component dengan source={{ uri: "..." }}
-- Gunakan borderRadius untuk rounded image
-- Props: name, bio, email, avatar
-
----
-
-## Soal 3: List Item dengan ScrollView
-
-**Tingkat: Mudah**
-
-Buatlah daftar 10 buah-buahan menggunakan ScrollView. Setiap item menampilkan:
-
-- Emoji buah
-- Nama buah
-- Background color berbeda untuk setiap item (alternating)
-
-**Data:**
+**Hint:**
 
 ```javascript
-const fruits = [
-  { id: 1, name: "Apel", emoji: "🍎" },
-  { id: 2, name: "Pisang", emoji: "🍌" },
-  { id: 3, name: "Jeruk", emoji: "🍊" },
-  // ... tambahkan 7 buah lainnya
-];
-```
-
-**Hints:**
-
-- Gunakan map() untuk render list
-- Gunakan key prop dengan id
-- Styling dengan marginVertical untuk spacing
-
----
-
-## Soal 4: Button Counter
-
-**Tingkat: Sedang**
-
-Buatlah aplikasi counter dengan fitur:
-
-- Display angka counter
-- Button "+" (increment)
-- Button "-" (decrement)
-- Button "Reset" (kembali ke 0)
-- Button "×2" (double)
-- Button "÷2" (half, gunakan Math.floor untuk hasil integer)
-
-**Tambahan:**
-
-- Counter tidak boleh negatif
-- Styling button dengan warna berbeda untuk setiap fungsi
-
-**Hints:**
-
-- Gunakan useState untuk state management
-- Import dari 'react'
-- Buat custom button component untuk reusability
-
----
-
-## Soal 5: Image Gallery dengan ScrollView Horizontal
-
-**Tingkat: Sedang**
-
-Buatlah image gallery horizontal yang dapat di-scroll ke samping dengan:
-
-- Minimal 5 gambar (gunakan picsum.photos atau unsplash)
-- ScrollView horizontal
-- Indicator tidak ditampilkan (showsHorizontalScrollIndicator={false})
-- Setiap image memiliki ukuran 300x200
-- Spacing antar gambar
-
-**Contoh:**
-
-```
-[IMG1] [IMG2] [IMG3] [IMG4] [IMG5] →
-```
-
-**Hints:**
-
-- Prop horizontal={true} pada ScrollView
-- Gunakan flexDirection: 'row'
-- marginHorizontal untuk spacing
-
----
-
-## Soal 6: Input Form Sederhana
-
-**Tingkat: Sedang**
-
-Buatlah form input dengan:
-
-- TextInput untuk "Nama"
-- TextInput untuk "Email"
-- TextInput untuk "Password" (dengan secureTextEntry)
-- Button "Submit"
-- Ketika submit, tampilkan data dalam Alert atau Text di bawah form
-
-**Validasi:**
-
-- Semua field harus diisi
-- Tampilkan peringatan jika ada yang kosong
-
-**Hints:**
-
-- Import TextInput dari 'react-native'
-- Gunakan useState untuk setiap input
-- Gunakan Alert.alert() untuk notifikasi
-
----
-
-## Soal 7: Card Component Reusable
-
-**Tingkat: Sedang**
-
-Buatlah komponen `Card` yang reusable dengan props:
-
-- title (string)
-- description (string)
-- image (uri)
-- buttonText (string)
-- onPress (function)
-
-Lalu buat screen yang menampilkan 3-4 Card dengan data berbeda.
-
-**Fitur Card:**
-
-- Image di atas
-- Title dengan font bold
-- Description
-- Button di bawah
-- Shadow/elevation effect
-
-**Contoh penggunaan:**
-
-```jsx
-<Card
-  title="React Native"
-  description="Learn mobile development"
-  image="https://picsum.photos/200"
-  buttonText="Learn More"
-  onPress={() => Alert.alert("Pressed!")}
-/>
+<Image source={{ uri: "https://picsum.photos/200/300" }} />
 ```
 
 ---
 
-## Soal 8: Platform-Specific Styling
+## Soal 3: Custom Component dengan Props
 
-**Tingkat: Sedang - Sulit**
+Buatlah custom component `ProductCard` yang menerima props dan dapat digunakan berulang kali.
 
-Buatlah komponen yang memiliki styling berbeda untuk iOS dan Android:
+**Kriteria:**
 
-- Tampilkan text "Platform: [iOS/Android]"
-- Tampilkan version platform
-- Card dengan shadow (gunakan shadowColor untuk iOS, elevation untuk Android)
-- Button dengan feedback berbeda (TouchableOpacity untuk iOS, TouchableNativeFeedback untuk Android)
+- Buat component `ProductCard` dalam file terpisah
+- Component menerima props: `name`, `price`, `description`, `imageUrl`
+- Gunakan destructuring untuk props
+- Export component menggunakan `export default`
+- Di App.js, import dan gunakan component minimal 3 kali dengan data berbeda
+- Tampilkan semua ProductCard dalam ScrollView
 
-**Hints:**
+**Struktur File:**
 
-- Import Platform dari 'react-native'
-- Gunakan Platform.OS
-- Gunakan Platform.select() untuk conditional styling
+```
+├── components/
+│   └── ProductCard.js
+└── App.js
+```
+
+**Data Produk (contoh):**
+
+- Laptop: Rp 10.000.000
+- Mouse: Rp 150.000
+- Keyboard: Rp 500.000
 
 ---
 
-## Soal 9: Todo List dengan Add & Delete
+## Soal 4: Button dengan Interaksi Alert
 
-**Tingkat: Sulit**
+Buatlah aplikasi kalkulator sederhana menggunakan komponen `Button` dan `Alert`.
 
-Buatlah aplikasi Todo List dengan fitur:
+**Kriteria:**
 
-- TextInput untuk input todo baru
-- Button "Add" untuk menambah todo
-- List menampilkan semua todo dengan:
-  - Nomor urut
-  - Text todo
-  - Button "Delete" untuk menghapus
-- Empty state ketika belum ada todo
+- Gunakan `View` sebagai container
+- Buat 4 tombol dengan judul: "Tambah", "Kurang", "Kali", "Bagi"
+- Setiap tombol ketika ditekan akan menampilkan `Alert` dengan pesan:
+  - "Operasi Penjumlahan"
+  - "Operasi Pengurangan"
+  - "Operasi Perkalian"
+  - "Operasi Pembagian"
+- Gunakan fungsi handler terpisah untuk setiap operasi
+- Tidak perlu implementasi kalkulasi, hanya tampilkan Alert
 
-**Struktur data:**
+**Hint:**
+
+```javascript
+import { Alert } from "react-native";
+Alert.alert("Judul", "Pesan");
+```
+
+---
+
+## Soal 5: ScrollView dengan List Data
+
+Buatlah aplikasi daftar mahasiswa menggunakan `ScrollView` yang menampilkan data dari array.
+
+**Kriteria:**
+
+- Buat array berisi minimal 10 data mahasiswa dengan struktur:
+  ```javascript
+  { id: 1, name: "Budi", nim: "123456", major: "Teknik Informatika" }
+  ```
+- Gunakan `ScrollView` untuk menampilkan semua data
+- Gunakan method `.map()` untuk render data
+- Setiap item mahasiswa tampilkan dalam `View` dengan key yang unik
+- Tampilkan nomor urut, nama, NIM, dan jurusan
+- Tidak perlu styling
+
+**Contoh Output:**
+
+```
+1. Budi (123456) - Teknik Informatika
+2. Ani (123457) - Sistem Informasi
+...
+```
+
+---
+
+## Soal 6: Multiple Components dengan Export/Import
+
+Buatlah aplikasi dengan struktur component yang terorganisir menggunakan multiple components.
+
+**Kriteria:**
+
+- Buat folder `components/`
+- Buat 3 custom components terpisah:
+  - `Header.js` - menampilkan judul aplikasi
+  - `Content.js` - menampilkan konten utama (bebas)
+  - `Footer.js` - menampilkan copyright/info
+- Setiap component export dengan `export default`
+- Di `App.js`, import semua component dan susun dengan urutan: Header, Content, Footer
+- Gunakan `SafeAreaView` sebagai container utama
+- Tidak perlu styling
+
+**Struktur File:**
+
+```
+├── components/
+│   ├── Header.js
+│   ├── Content.js
+│   └── Footer.js
+└── App.js
+```
+
+---
+
+## Soal 7: Props dengan Default Values
+
+Buatlah custom component `UserCard` yang menggunakan props dengan default values.
+
+**Kriteria:**
+
+- Buat component `UserCard` yang menerima props: `name`, `age`, `city`, `avatar`
+- Berikan default value untuk setiap props:
+  - name: "Anonymous"
+  - age: 0
+  - city: "Unknown"
+  - avatar: URL placeholder image
+- Gunakan destructuring dengan default values
+- Buat 4 UserCard dengan variasi:
+  1. Semua props lengkap
+  2. Tanpa props age
+  3. Tanpa props city dan avatar
+  4. Tanpa props sama sekali (gunakan semua default)
+- Tampilkan dalam ScrollView
+
+---
+
+## Soal 8: Platform Specific Component
+
+Buatlah aplikasi yang menampilkan informasi berbeda berdasarkan platform (iOS/Android).
+
+**Kriteria:**
+
+- Import `Platform` dari react-native
+- Tampilkan informasi platform saat ini: `Platform.OS` dan `Platform.Version`
+- Buat 2 `Text` component dengan conditional rendering:
+  - Satu hanya tampil di iOS dengan pesan "Anda menggunakan iOS"
+  - Satu hanya tampil di Android dengan pesan "Anda menggunakan Android"
+- Buat component `PlatformButton` yang menggunakan:
+  - `TouchableOpacity` untuk iOS
+  - `TouchableNativeFeedback` untuk Android (wrap dengan View)
+- Tampilkan Alert ketika button ditekan dengan info platform
+
+**Hint:**
+
+```javascript
+{
+  Platform.OS === "ios" && <Text>iOS Only</Text>;
+}
+{
+  Platform.OS === "android" && <Text>Android Only</Text>;
+}
+```
+
+---
+
+## Soal 9: Named Export dan Multiple Components
+
+Buatlah file yang mengexport multiple components menggunakan named export.
+
+**Kriteria:**
+
+- Buat file `components/Cards.js`
+- Buat 3 components dalam 1 file:
+  - `InfoCard` - menampilkan informasi umum
+  - `WarningCard` - menampilkan peringatan
+  - `SuccessCard` - menampilkan pesan sukses
+- Export semua component menggunakan named export (bukan default)
+- Di App.js, import ketiga component sekaligus
+- Gunakan ketiga component dengan props `message` yang berbeda
+- Tidak perlu styling, hanya struktur component
+
+**Contoh Export:**
+
+```javascript
+export function InfoCard({ message }) { ... }
+export function WarningCard({ message }) { ... }
+export function SuccessCard({ message }) { ... }
+```
+
+**Contoh Import:**
+
+```javascript
+import { InfoCard, WarningCard, SuccessCard } from "./components/Cards";
+```
+
+---
+
+## Soal 10: Complete App - Contact List
+
+Buatlah aplikasi Contact List yang lengkap menggunakan semua konsep yang telah dipelajari.
+
+**Kriteria:**
+
+- Buat struktur folder yang terorganisir:
+  ```
+  ├── components/
+  │   ├── Header.js
+  │   └── ContactCard.js
+  └── App.js
+  ```
+
+**Component Header:**
+
+- Menerima props `title`
+- Default value title: "My Contacts"
+- Gunakan SafeAreaView
+
+**Component ContactCard:**
+
+- Menerima props: `name`, `phone`, `email`, `avatar`
+- Tampilkan semua informasi dalam View
+- Gunakan Image untuk avatar
+- Buat Button "Call" yang menampilkan Alert dengan info nama dan nomor telepon
+
+**App.js:**
+
+- Import semua components
+- Buat array minimal 5 contacts dengan data lengkap
+- Gunakan ScrollView untuk menampilkan semua ContactCard
+- Gunakan method .map() untuk render
+- Tambahkan Text untuk menampilkan total contacts
+- Tambahkan Button "Add Contact" di bawah yang menampilkan Alert "Fitur dalam pengembangan"
+
+**Data Contact (contoh):**
 
 ```javascript
 [
-  { id: 1, text: "Belajar React Native", completed: false },
-  { id: 2, text: "Buat project", completed: false },
+  {
+    id: 1,
+    name: "John Doe",
+    phone: "08123456789",
+    email: "john@example.com",
+    avatar: "https://picsum.photos/50",
+  },
+  // ... 4 data lainnya
 ];
 ```
 
-**Bonus:**
+**Platform Specific:**
 
-- Checkbox untuk mark as completed
-- Strike-through text untuk completed todo
-- Counter jumlah todo
+- Gunakan Platform.select untuk menentukan style behavior yang berbeda (optional)
+- Tampilkan info platform di Footer
 
-**Hints:**
+**Tidak perlu styling**, fokus pada:
 
-- Gunakan array state
-- Gunakan filter() untuk delete
-- Gunakan Date.now() atau uuid untuk unique id
+- Struktur component yang baik
+- Penggunaan props dengan benar
+- Export/Import yang proper
+- Component reusability
+- Data handling dengan array dan map
 
 ---
 
-## Soal 10: Product Catalog dengan Filter
+## Submission Guidelines
 
-**Tingkat: Sulit**
+Untuk setiap soal:
 
-Buatlah aplikasi katalog produk dengan fitur:
+1. **Struktur File:**
 
-**Data produk:**
+   ```
+   soal-X/
+   ├── components/ (jika diperlukan)
+   ├── App.js
+   └── package.json (jika perlu)
+   ```
 
-```javascript
-const products = [
-  {
-    id: 1,
-    name: "Laptop",
-    price: 15000000,
-    category: "Electronics",
-    image: "url",
-  },
-  {
-    id: 2,
-    name: "Mouse",
-    price: 150000,
-    category: "Electronics",
-    image: "url",
-  },
-  { id: 3, name: "Desk", price: 2000000, category: "Furniture", image: "url" },
-  { id: 4, name: "Chair", price: 1500000, category: "Furniture", image: "url" },
-  {
-    id: 5,
-    name: "Keyboard",
-    price: 500000,
-    category: "Electronics",
-    image: "url",
-  },
-  // tambahkan 5 produk lagi
-];
-```
+2. **Format Code:**
 
-**Fitur:**
+   - Gunakan indentasi yang konsisten (2 atau 4 spasi)
+   - Berikan comment untuk bagian penting
+   - Gunakan naming convention yang baik (PascalCase untuk component)
 
-- Tampilkan semua produk dalam card (ScrollView)
-- Search input untuk filter berdasarkan nama
-- Buttons filter kategori: "All", "Electronics", "Furniture"
-- Tampilkan harga dengan format Rupiah (Rp 1.500.000)
-- Tampilkan jumlah produk yang ditampilkan
+3. **Testing:**
 
-**Komponen yang harus dibuat:**
+   - Test di Expo Go
+   - Pastikan tidak ada error di console
+   - Screenshot hasil jika perlu
 
-- ProductCard (reusable)
-- SearchBar
-- FilterButtons
-- ProductList
-
-**Bonus:**
-
-- Sort by price (ascending/descending)
-- Tampilkan "No products found" jika hasil filter kosong
-- Button "Clear Filter"
+4. **Checklist:**
+   - ✅ Component berjalan tanpa error
+   - ✅ Props berfungsi dengan benar
+   - ✅ Import/Export bekerja
+   - ✅ Struktur folder sesuai (jika ada)
+   - ✅ Code readable dan rapi
 
 ---
 
 ## Tips Pengerjaan
 
-1. **Setup dulu, koding kemudian** - Pastikan Expo berjalan dengan baik
-2. **Component kecil dulu** - Mulai dari View dan Text sederhana
-3. **Test di device** - Gunakan Expo Go untuk testing real-time
-4. **Console.log adalah teman** - Debug dengan console.log
-5. **Baca error message** - React Native error message sangat informatif
-6. **Screenshot progress** - Dokumentasikan hasil setiap soal
+1. **Mulai dari yang Simple:**
 
-## Resources
+   - Kerjakan soal 1-3 terlebih dahulu
+   - Pahami konsep dasar sebelum ke soal kompleks
 
-- [Expo Documentation](https://docs.expo.dev/)
-- [React Native Components](https://reactnative.dev/docs/components-and-apis)
-- [React Native StyleSheet](https://reactnative.dev/docs/stylesheet)
-- [React Hooks](https://react.dev/reference/react)
+2. **Fokus pada Core Components:**
 
-## Testing Checklist
+   - Soal ini fokus pada View, Text, Image, Button, ScrollView
+   - Belum ada styling (akan dipelajari di pertemuan selanjutnya)
 
-Untuk setiap soal, pastikan:
+3. **Pahami Props:**
 
-- ✅ Berjalan tanpa error
-- ✅ Tampil dengan baik di device
-- ✅ Responsive terhadap interaksi user
-- ✅ Code rapi dan terorganisir
-- ✅ Ada comments untuk code yang kompleks
+   - Props adalah cara passing data ke component
+   - Gunakan destructuring untuk code yang lebih clean
+   - Default values berguna untuk optional props
+
+4. **Organisasi File:**
+
+   - Pisahkan component ke file berbeda untuk reusability
+   - Gunakan folder `components/` untuk custom components
+   - Import dan export dengan benar
+
+5. **Testing:**
+
+   - Gunakan console.log untuk debugging
+   - Test dengan data berbeda
+   - Pastikan component reusable
+
+6. **Common Errors:**
+   - Lupa import component dari react-native
+   - Salah path saat import custom component
+   - Lupa export component
+   - Key tidak unik saat mapping array
 
 ---
 
-## Submission
+## Resources
 
-Simpan hasil pengerjaan dalam folder `praktek/pertemuan-4/solutions/` dengan struktur:
+- [React Native Documentation - Core Components](https://reactnative.dev/docs/components-and-apis)
+- [React Native - View](https://reactnative.dev/docs/view)
+- [React Native - Text](https://reactnative.dev/docs/text)
+- [React Native - Image](https://reactnative.dev/docs/image)
+- [React Native - Button](https://reactnative.dev/docs/button)
+- [React Native - ScrollView](https://reactnative.dev/docs/scrollview)
+- [React - Components and Props](https://react.dev/learn/passing-props-to-a-component)
+- [Expo Documentation](https://docs.expo.dev/)
 
-```
-solutions/
-├── soal-1/
-│   └── App.js
-├── soal-2/
-│   ├── App.js
-│   └── components/
-│       └── ProfileCard.js
-├── soal-3/
-│   └── App.js
-...
-```
+---
 
-Atau buat 1 repository Git dengan branch terpisah untuk setiap soal.
+## Catatan Penting
 
-**Selamat Mengerjakan! 📱🚀**
+⚠️ **Soal-soal ini TIDAK menggunakan:**
+
+- StyleSheet atau styling apapun (akan dipelajari di pertemuan selanjutnya)
+- State management (useState, useEffect, dll - akan dipelajari di pertemuan selanjutnya)
+- Navigation
+- API calls
+- Database
+
+✅ **Focus pada:**
+
+- Struktur component yang benar
+- Penggunaan core components (View, Text, Image, Button, ScrollView)
+- Props dan data passing
+- Import/Export components
+- Organisasi file dan folder
+- Platform detection (Platform.OS)
+
+---
+
+**Selamat Mengerjakan! 🚀**
+
+_Ingat: Kualitas code lebih penting daripada kuantitas. Pastikan code Anda clean, readable, dan mengikuti best practices!_
