@@ -82,7 +82,11 @@ const App = () => {
     </View>
   );
 };
+```
 
+---
+
+```javascript
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -120,8 +124,6 @@ const styles = StyleSheet.create({
 });
 ```
 
-Penggunaan:
-
 ```javascript
 <View style={styles.box}>
   <Text style={styles.text}>Box</Text>
@@ -139,6 +141,8 @@ Penggunaan:
   <Text style={{ fontSize: 16, color: "white" }}>Inline</Text>
 </View>
 ```
+
+---
 
 **StyleSheet:**
 
@@ -197,6 +201,8 @@ Default: flexDirection adalah 'column' (berbeda dengan web yang 'row')
 - alignSelf
 - flexGrow, flexShrink, flexBasis
 
+---
+
 ```javascript
 <View style={styles.container}>
   {" "}
@@ -209,6 +215,13 @@ Default: flexDirection adalah 'column' (berbeda dengan web yang 'row')
 ---
 
 ## Property flexDirection
+
+- Menentukan arah susunan anak (main axis) dalam container flex.
+- Nilai yang didukung: `column` (default, atas → bawah), `row` (kiri → kanan), `column-reverse` (bawah → atas), `row-reverse` (kanan → kiri).
+- Mempengaruhi arah pengukuran `justifyContent` (karena mengikuti main axis) dan urutan visual anak.
+- Berbeda dengan web, default React Native adalah `column`.
+
+---
 
 ```javascript
 const styles = StyleSheet.create({
@@ -248,7 +261,11 @@ const FlexDirectionExample = () => {
     </View>
   );
 };
+```
 
+---
+
+```javascript
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -266,6 +283,13 @@ const styles = StyleSheet.create({
 ---
 
 ## Property justifyContent (Alignment Sumbu Utama)
+
+- Mengatur perataan anak terhadap sumbu utama (main axis) yang ditentukan oleh `flexDirection`.
+- Nilai umum: `flex-start` (awal), `center` (tengah), `flex-end` (akhir), `space-between` (jarak hanya di antara item), `space-around` (jarak di kiri/kanan tiap item sama, tepi luar setengah), `space-evenly` (jarak sama rata termasuk tepi luar).
+- Default: `flex-start`.
+- Tips: Ubah `flexDirection` untuk menggeser arah perataan (horizontal vs vertikal).
+
+---
 
 ```javascript
 const styles = StyleSheet.create({
@@ -304,7 +328,11 @@ const JustifyContentExample = () => {
     </View>
   );
 };
+```
 
+---
+
+```javascript
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -322,6 +350,13 @@ const styles = StyleSheet.create({
 ---
 
 ## Property alignItems (Alignment Sumbu Silang)
+
+- Mengatur perataan anak terhadap sumbu silang (cross axis), yaitu sumbu yang tegak lurus dengan `flexDirection`.
+- Nilai umum: `stretch` (default, melebar memenuhi cross axis jika tanpa ukuran tetap), `flex-start`, `center`, `flex-end`, `baseline` (berdasarkan baseline teks).
+- Default: `stretch`.
+- Catatan: Jika anak memiliki `width`/`height` tetap di cross axis, efek `stretch` tidak terlihat.
+
+---
 
 ```javascript
 const styles = StyleSheet.create({
@@ -357,7 +392,11 @@ const AlignItemsExample = () => {
     </View>
   );
 };
+```
 
+---
+
+```javascript
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -378,6 +417,12 @@ const styles = StyleSheet.create({
 
 ## Property alignSelf (Override alignItems)
 
+- Mengoverride nilai `alignItems` dari parent untuk satu item saja.
+- Nilai sama dengan `alignItems` ditambah `auto` (mengikuti parent).
+- Berguna untuk membuat pengecualian alignment pada item tertentu tanpa mengubah seluruh container.
+
+---
+
 ```javascript
 const AlignSelfExample = () => {
   return (
@@ -388,7 +433,11 @@ const AlignSelfExample = () => {
     </View>
   );
 };
+```
 
+---
+
+```javascript
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -420,6 +469,13 @@ const styles = StyleSheet.create({
 
 ## Property flex (Proportional Sizing)
 
+- Shorthand dari tiga properti: `flexGrow` (seberapa banyak tumbuh), `flexShrink` (seberapa banyak menyusut), `flexBasis` (ukuran dasar sebelum distribusi ruang).
+- Di React Native, nilai numerik sederhana umum dipakai sebagai proporsi (mis. 1, 2, 3) untuk membagi ruang kosong di sepanjang main axis.
+- Contoh: total `flex` 1+2+1=4 → proporsi 25% : 50% : 25%.
+- Hindari menggabungkan `flex` dengan `width/height` tetap di main axis jika tidak diperlukan agar layout tetap responsif.
+
+---
+
 ```javascript
 const FlexExample = () => {
   return (
@@ -436,7 +492,11 @@ const FlexExample = () => {
     </View>
   );
 };
+```
 
+---
+
+```javascript
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -456,6 +516,8 @@ const styles = StyleSheet.create({
   },
 });
 ```
+
+---
 
 Total flex = 1 + 2 + 1 = 4
 
@@ -485,7 +547,11 @@ const ResponsiveLayout = () => {
     </View>
   );
 };
+```
 
+---
+
+```javascript
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -528,6 +594,13 @@ const styles = StyleSheet.create({
 
 ## Property flexWrap (Wrapping Items)
 
+- Mengatur apakah item boleh pindah ke baris/kolom berikutnya saat tidak muat pada satu garis main axis.
+- Nilai: `nowrap` (default, tidak membungkus), `wrap` (membungkus ke baris/kolom baru).
+- Catatan: `wrap-reverse` tidak didukung di React Native.
+- Sering dipakai bersama `flexDirection: 'row'` untuk membuat grid sederhana.
+
+---
+
 ```javascript
 const FlexWrapExample = () => {
   return (
@@ -540,7 +613,11 @@ const FlexWrapExample = () => {
     </View>
   );
 };
+```
 
+---
+
+```javascript
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -569,6 +646,13 @@ const styles = StyleSheet.create({
 
 ## Spacing: padding vs margin
 
+- `padding`: ruang DI DALAM batas elemen (antara konten dan border).
+- `margin`: ruang DI LUAR batas elemen (jarak antar elemen).
+- Variasi sisi: `Top`, `Right`, `Bottom`, `Left` serta `Horizontal` (Left+Right) dan `Vertical` (Top+Bottom).
+- Satuan di RN adalah density-independent pixel (tanpa `px`). `margin: 'auto'` tidak didukung.
+
+---
+
 ```javascript
 const SpacingExample = () => {
   return (
@@ -583,7 +667,11 @@ const SpacingExample = () => {
     </View>
   );
 };
+```
 
+---
+
+```javascript
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -616,6 +704,13 @@ const styles = StyleSheet.create({
 
 ## Border Styling
 
+- `borderWidth`, `borderColor`, dan `borderRadius` adalah properti utama untuk garis tepi dan sudut membulat.
+- Tersedia varian sisi: `borderTopWidth`, `borderLeftColor`, `borderTopLeftRadius`, dll.
+- Lingkaran sempurna: set `width === height` dan `borderRadius` = setengah dari ukuran.
+- Efek bayangan bukan bagian dari border; gunakan `shadow*` (iOS) atau `elevation` (Android).
+
+---
+
 ```javascript
 const BorderExample = () => {
   return (
@@ -634,7 +729,11 @@ const BorderExample = () => {
     </View>
   );
 };
+```
 
+---
+
+```javascript
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -679,6 +778,13 @@ const styles = StyleSheet.create({
 
 ## Background dan Color Properties
 
+- `backgroundColor` untuk latar komponen; `color` untuk warna teks pada komponen `Text`.
+- Format warna yang didukung: Hex (`#RRGGBB`), `rgb(r,g,b)`, `rgba(r,g,b,a)`, dan nama warna tertentu (mis. `tomato`).
+- Transparansi gunakan kanal alpha pada `rgba` atau hex 8 digit (`#RRGGBBAA` pada RN terbaru).
+- Gradien tidak native; gunakan library pihak ketiga (mis. `react-native-linear-gradient`).
+
+---
+
 ```javascript
 const ColorExample = () => {
   return (
@@ -701,7 +807,11 @@ const ColorExample = () => {
     </View>
   );
 };
+```
 
+---
+
+```javascript
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -745,6 +855,13 @@ const styles = StyleSheet.create({
 
 ## Text Styling
 
+- Properti umum: `fontSize`, `fontWeight`, `color`, `lineHeight`, `textAlign`, `fontStyle`, `textDecorationLine`.
+- `fontWeight`: `normal`, `bold`, atau angka `'100'`–`'900'` (ketersediaan tergantung font yang dipakai).
+- `textAlign`: `left`, `right`, `center`, `justify`; `lineHeight` mengatur jarak antar baris.
+- Untuk pemotongan teks gunakan prop pada `Text` seperti `numberOfLines` dan `ellipsizeMode` (bukan style).
+
+---
+
 ```javascript
 const TextStylingExample = () => {
   return (
@@ -761,7 +878,11 @@ const TextStylingExample = () => {
     </View>
   );
 };
+```
 
+---
+
+```javascript
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -844,7 +965,11 @@ const CardComponent = () => {
     </View>
   );
 };
+```
 
+---
+
+```javascript
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -944,7 +1069,11 @@ const GridLayout = () => {
     </View>
   );
 };
+```
 
+---
+
+```javascript
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -997,6 +1126,8 @@ const styles = StyleSheet.create({
 **7. Platform specific** - Gunakan Platform API jika perlu
 **8. Performance** - Hindari nested styles yang dalam
 
+---
+
 ```javascript
 // Constants file (colors.js)
 export const COLORS = {
@@ -1032,7 +1163,7 @@ B. Performa lebih baik karena style di-cache
 C. Tidak ada perbedaan
 D. Ukuran file lebih kecil
 
-**Jawaban: B**
+<!-- **Jawaban: B** -->
 
 ---
 
@@ -1045,7 +1176,7 @@ B. row-reverse
 C. column
 D. column-reverse
 
-**Jawaban: C**
+<!-- **Jawaban: C** -->
 
 ---
 
@@ -1058,7 +1189,7 @@ B. alignSelf
 C. justifyContent
 D. alignContent
 
-**Jawaban: C**
+<!-- **Jawaban: C** -->
 
 ---
 
@@ -1071,7 +1202,7 @@ B. 33%
 C. 50%
 D. 66%
 
-**Jawaban: C**
+<!-- **Jawaban: C** -->
 
 ---
 
@@ -1084,7 +1215,7 @@ B. background_color
 C. backgroundColor
 D. BackgroundColor
 
-**Jawaban: C**
+<!-- **Jawaban: C** -->
 
 ---
 
@@ -1097,7 +1228,7 @@ B. wrapContent: true
 C. flexBreak: true
 D. multiLine: true
 
-**Jawaban: A**
+<!-- **Jawaban: A** -->
 
 ---
 
@@ -1110,7 +1241,7 @@ B. Padding adalah ruang di dalam element, margin adalah ruang di luar element
 C. Padding adalah ruang di luar element, margin adalah ruang di dalam element
 D. Keduanya sama, hanya nama yang berbeda
 
-**Jawaban: B**
+<!-- **Jawaban: B** -->
 
 ---
 
@@ -1123,7 +1254,7 @@ B. borderRadius dengan nilai setengah dari width/height
 C. circular: true
 D. roundShape: true
 
-**Jawaban: B**
+<!-- **Jawaban: B** -->
 
 ---
 
@@ -1136,7 +1267,7 @@ B. customAlign
 C. alignSelf
 D. selfAlign
 
-**Jawaban: C**
+<!-- **Jawaban: C** -->
 
 ---
 
@@ -1149,4 +1280,4 @@ B. space-around
 C. space-evenly
 D. space-equal
 
-**Jawaban: C**
+<!-- **Jawaban: C** -->
