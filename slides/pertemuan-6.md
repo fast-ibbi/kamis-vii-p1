@@ -1,7 +1,7 @@
 ---
-title: Navigasi pada React Native (Stack, Tab, Drawer)
+title: Navigasi dengan Expo Router (File-based Routing)
 version: 1.0.0
-header: Navigasi pada React Native (Stack, Tab, Drawer)
+header: Navigasi dengan Expo Router (File-based Routing)
 footer: https://github.com/fast-ibbi/kamis-vii-p1
 paginate: true
 marp: true
@@ -12,117 +12,413 @@ _class: lead
 _paginate: skip
 -->
 
-# **Navigasi pada React Native (Stack, Tab, Drawer)**
+# **Navigasi dengan Expo Router (File-based Routing)**
 
 ---
 
-### Pengenalan Navigasi
+# Pengenalan Expo Router
 
-**1. Pentingnya Navigasi dalam Aplikasi Mobile**
+---
 
-Navigasi adalah komponen fundamental dalam aplikasi mobile yang memungkinkan pengguna berpindah antar layar. Tanpa navigasi yang baik, aplikasi akan sulit digunakan dan memberikan pengalaman pengguna yang buruk. Navigasi yang intuitif meningkatkan user experience dan membuat aplikasi lebih profesional.
+## **Apa itu Expo Router?**
 
-**2. Perbedaan Navigasi Web vs Mobile**
+Expo Router adalah sistem navigasi berbasis file (file-based routing) untuk React Native. Mirip dengan Next.js untuk web, Expo Router menggunakan struktur folder sebagai routing system. Setiap file dalam folder `app` otomatis menjadi route/halaman. Ini membuat navigasi lebih intuitif dan mudah dipahami.
 
-Navigasi web menggunakan URL dan browser history, sedangkan mobile menggunakan stack of screens. Di web, navigasi bersifat linear dengan back button browser. Di mobile, navigasi lebih kompleks dengan gesture-based navigation (swipe, tap) dan tidak memiliki address bar. Mobile juga memiliki pola navigasi khusus seperti tab bar dan drawer menu.
+---
 
-**3. Library Navigasi di React Native**
+## **Keunggulan File-based Routing**
 
-Beberapa library navigasi populer untuk React Native:
+- **Intuitif**: Struktur folder = struktur navigasi
+- **Auto-completion**: IDE dapat autocomplete route names
+- **Type-safe**: TypeScript support untuk routing
+- **Deep linking**: Built-in support untuk universal links
+- **SEO Friendly**: Mendukung web dengan URL yang baik
+- **Less boilerplate**: Tidak perlu setup navigator secara manual
 
-- React Navigation (paling populer, community-driven)
-- React Native Navigation (Wix, native performance)
-- React Router Native (mirip React Router untuk web)
+---
 
-React Navigation dipilih karena pure JavaScript, mudah dikustomisasi, dan memiliki dokumentasi lengkap.
+## **Perbandingan dengan React Navigation**
 
-**4. Mengapa React Navigation?**
+| Feature        | Expo Router    | React Navigation     |
+| -------------- | -------------- | -------------------- |
+| Setup          | File structure | Manual configuration |
+| Routes         | Auto-generated | Manual definition    |
+| Deep linking   | Built-in       | Requires setup       |
+| Web support    | Native         | Requires config      |
+| Learning curve | Mudah          | Sedang               |
+| Flexibility    | Tinggi         | Sangat tinggi        |
 
-React Navigation adalah pilihan terbaik karena:
+---
 
-- Mudah diimplementasikan dan dikustomisasi
-- Performa baik dengan optimasi built-in
-- Mendukung berbagai pola navigasi (stack, tab, drawer)
-- Dokumentasi lengkap dan komunitas besar
-- Terus diupdate dan di-maintain
-- Kompatibel dengan Expo dan bare React Native
+## **Struktur Folder App Directory**
 
-**5. Instalasi React Navigation dan Dependencies**
-
-```bash
-# Install core library
-npm install @react-navigation/native
-
-# Install dependencies untuk Expo
-npx expo install react-native-screens react-native-safe-area-context
-
-# Atau untuk bare React Native
-npm install react-native-screens react-native-safe-area-context
+```
+app/
+├── _layout.tsx        # Root layout
+├── index.tsx          # Home screen (/)
+├── about.tsx          # About screen (/about)
+├── (tabs)/            # Tab navigation group
+│   ├── _layout.tsx
+│   ├── index.tsx      # Tab home
+│   └── profile.tsx    # Tab profile
+└── [id].tsx           # Dynamic route (/123)
 ```
 
-Kemudian wrap aplikasi dengan NavigationContainer di App.js:
+Setiap file dalam folder `app` adalah sebuah screen/route.
 
-```javascript
-import { NavigationContainer } from "@react-navigation/native";
+---
 
-export default function App() {
+## **Root Layout (\_layout.tsx)**
+
+```typescript
+import { Stack } from "expo-router";
+
+export default function RootLayout() {
   return (
-    <NavigationContainer>
-      {/* Navigator akan diletakkan di sini */}
-    </NavigationContainer>
+    <Stack>
+      <Stack.Screen name="index" options={{ title: "Home" }} />
+      <Stack.Screen name="about" options={{ title: "About" }} />
+    </Stack>
   );
 }
 ```
 
+Root layout mengatur navigasi untuk seluruh aplikasi.
+
 ---
 
-### Stack Navigation
+# Stack Navigation dengan Expo Router
 
-**6. Konsep Stack Navigation**
+---
 
-Stack Navigation bekerja seperti tumpukan kartu. Setiap screen baru ditambahkan di atas stack. Ketika back, screen teratas dihapus dan kembali ke screen sebelumnya. Ini adalah pola navigasi paling umum di mobile apps, mirip dengan history browser tetapi lebih visual dengan animasi transisi.
+## **Stack Navigation secara Default**
 
-**7. Instalasi @react-navigation/native-stack**
+Expo Router menggunakan Stack Navigation sebagai default. Setiap file di root `app` directory otomatis menjadi stack screen. Tidak perlu import atau setup Stack Navigator secara manual seperti di React Navigation.
 
-```bash
-npm install @react-navigation/native-stack
-```
+---
 
-Native Stack Navigator menggunakan native navigation APIs untuk performa optimal.
+## **Membuat Screen Pertama (app/index.tsx)**
 
-**8. Struktur Dasar Stack Navigator**
-
-```javascript
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
-const Stack = createNativeStackNavigator();
-
-function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Details" component={DetailsScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
-```
-
-**9. Membuat Screen Pertama**
-
-```javascript
+```typescript
 import { View, Text, StyleSheet } from "react-native";
+import { Link } from "expo-router";
 
-function HomeScreen() {
+export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Home Screen</Text>
-      <Text>Ini adalah halaman utama aplikasi</Text>
+      <Text>Selamat datang di aplikasi Expo Router</Text>
+
+      <Link href="/about" style={styles.link}>
+        <Text style={styles.linkText}>Go to About</Text>
+      </Link>
     </View>
   );
 }
+```
 
+---
+
+```javascript
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  link: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#6200ee",
+    borderRadius: 5,
+  },
+  linkText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+});
+```
+
+---
+
+## **Navigasi dengan Link Component**
+
+```typescript
+import { Link } from "expo-router";
+
+// Navigasi sederhana
+<Link href="/about">Go to About</Link>
+
+// Dengan style
+<Link href="/profile" style={styles.link}>
+  <Text style={styles.linkText}>View Profile</Text>
+</Link>
+
+// Dengan parameter
+<Link href={{ pathname: "/details", params: { id: "123" } }}>
+  View Details
+</Link>
+```
+
+---
+
+## **Navigasi Programmatic dengan useRouter**
+
+```typescript
+import { useRouter } from "expo-router";
+import { Button } from "react-native";
+
+export default function HomeScreen() {
+  const router = useRouter();
+
+  return (
+    <View style={styles.container}>
+      <Button title="Go to Details" onPress={() => router.push("/details")} />
+
+      <Button title="Go to Profile" onPress={() => router.push("/profile")} />
+
+      <Button title="Go Back" onPress={() => router.back()} />
+    </View>
+  );
+}
+```
+
+---
+
+## **Dynamic Routes (app/[id].tsx)**
+
+Buat file dengan nama dalam kurung siku untuk dynamic route:
+
+```typescript
+// File: app/user/[id].tsx
+import { View, Text } from "react-native";
+import { useLocalSearchParams } from "expo-router";
+
+export default function UserDetailScreen() {
+  const { id } = useLocalSearchParams();
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>User Detail</Text>
+      <Text>User ID: {id}</Text>
+    </View>
+  );
+}
+```
+
+Akses route: `/user/123` akan menampilkan User ID: 123
+
+---
+
+## **Passing dan Mengakses Parameters**
+
+```typescript
+// Mengirim parameter menggunakan router.push
+import { useRouter } from "expo-router";
+
+export default function HomeScreen() {
+  const router = useRouter();
+
+  const goToDetails = () => {
+    router.push({
+      pathname: "/details",
+      params: {
+        id: "123",
+        name: "React Native Course",
+        price: "150000",
+      },
+    });
+  };
+
+  return <Button title="View Details" onPress={goToDetails} />;
+}
+```
+
+---
+
+```typescript
+// Menerima parameter menggunakan useLocalSearchParams
+// File: app/details.tsx
+import { View, Text } from "react-native";
+import { useLocalSearchParams } from "expo-router";
+
+export default function DetailsScreen() {
+  const { id, name, price } = useLocalSearchParams();
+
+  return (
+    <View style={styles.container}>
+      <Text>Item ID: {id}</Text>
+      <Text>Name: {name}</Text>
+      <Text>Price: Rp {price}</Text>
+    </View>
+  );
+}
+```
+
+---
+
+## **Kustomisasi Header di \_layout.tsx**
+
+```typescript
+import { Stack } from "expo-router";
+
+export default function Layout() {
+  return (
+    <Stack
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: "#6200ee",
+        },
+        headerTintColor: "#fff",
+        headerTitleStyle: {
+          fontWeight: "bold",
+        },
+      }}
+    >
+      <Stack.Screen name="index" options={{ title: "Beranda" }} />
+      <Stack.Screen name="details" options={{ title: "Detail Produk" }} />
+      <Stack.Screen
+        name="about"
+        options={{
+          title: "Tentang",
+          headerShown: false, // Sembunyikan header
+        }}
+      />
+    </Stack>
+  );
+}
+```
+
+---
+
+## **Header dengan Action Buttons**
+
+```typescript
+import { Stack } from "expo-router";
+import { TouchableOpacity, Text } from "react-native";
+import { useRouter } from "expo-router";
+
+export default function Layout() {
+  const router = useRouter();
+
+  return (
+    <Stack>
+      <Stack.Screen
+        name="index"
+        options={{
+          title: "Home",
+          headerRight: () => (
+            <TouchableOpacity onPress={() => router.push("/settings")}>
+              <Text style={{ color: "#fff", marginRight: 10 }}>Settings</Text>
+            </TouchableOpacity>
+          ),
+        }}
+      />
+    </Stack>
+  );
+}
+```
+
+---
+
+# Tab Navigation dengan Expo Router
+
+---
+
+## **Tab Navigation menggunakan Groups**
+
+Expo Router menggunakan folder dengan tanda kurung untuk membuat tab navigation. Folder `(tabs)` akan otomatis menjadi tab navigator.
+
+```
+app/
+├── _layout.tsx
+├── (tabs)/
+│   ├── _layout.tsx    # Tab configuration
+│   ├── index.tsx      # Tab 1: Home
+│   ├── search.tsx     # Tab 2: Search
+│   └── profile.tsx    # Tab 3: Profile
+```
+
+---
+
+## **Membuat Tab Layout (app/(tabs)/\_layout.tsx)**
+
+```typescript
+import { Tabs } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+
+export default function TabLayout() {
+  return (
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: "#6200ee",
+        tabBarInactiveTintColor: "gray",
+        headerShown: false,
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="search"
+        options={{
+          title: "Search",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="search" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person" size={size} color={color} />
+          ),
+        }}
+      />
+    </Tabs>
+  );
+}
+```
+
+---
+
+## **Tab Screen (app/(tabs)/index.tsx)**
+
+```typescript
+import { View, Text, StyleSheet } from "react-native";
+import { Link } from "expo-router";
+
+export default function HomeTab() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Home Tab</Text>
+      <Text>This is the home tab</Text>
+
+      <Link href="/details" style={styles.link}>
+        <Text style={styles.linkText}>Go to Details</Text>
+      </Link>
+    </View>
+  );
+}
+```
+
+---
+
+```javascript
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -134,427 +430,217 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
   },
+  link: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#6200ee",
+    borderRadius: 5,
+  },
+  linkText: {
+    color: "#fff",
+  },
 });
 ```
 
-**10. Navigasi Antar Screen dengan navigation.navigate()**
+---
 
-```javascript
-import { View, Text, Button } from "react-native";
+## **Kustomisasi Tab Bar**
 
-function HomeScreen({ navigation }) {
+```typescript
+import { Tabs } from "expo-router";
+
+export default function TabLayout() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Home Screen</Text>
-      <Button
-        title="Go to Details"
-        onPress={() => navigation.navigate("Details")}
-      />
-    </View>
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: "#6200ee",
+        tabBarInactiveTintColor: "#999",
+        tabBarStyle: {
+          backgroundColor: "#ffffff",
+          borderTopWidth: 1,
+          borderTopColor: "#e0e0e0",
+          height: 60,
+          paddingBottom: 5,
+          paddingTop: 5,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "600",
+        },
+        tabBarIconStyle: {
+          marginBottom: -3,
+        },
+      }}
+    >
+      {/* Tab screens */}
+    </Tabs>
   );
 }
 ```
 
-Prop `navigation` otomatis tersedia di setiap screen component.
+---
 
-**11. Passing Parameters Antar Screen**
+## **Badge pada Tab Icons**
 
-```javascript
-function HomeScreen({ navigation }) {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Home Screen</Text>
-      <Button
-        title="Go to Details"
-        onPress={() =>
-          navigation.navigate("Details", {
-            itemId: 86,
-            itemName: "React Native Course",
-            price: 150000,
-          })
-        }
-      />
-    </View>
-  );
-}
-```
-
-**12. Mengakses Parameter di Screen Tujuan**
-
-```javascript
-function DetailsScreen({ route, navigation }) {
-  const { itemId, itemName, price } = route.params;
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Details Screen</Text>
-      <Text>Item ID: {itemId}</Text>
-      <Text>Item Name: {itemName}</Text>
-      <Text>Price: Rp {price.toLocaleString()}</Text>
-    </View>
-  );
-}
-```
-
-**13. Navigasi Kembali dengan navigation.goBack()**
-
-```javascript
-function DetailsScreen({ route, navigation }) {
-  const { itemName } = route.params;
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{itemName}</Text>
-      <Button title="Go Back" onPress={() => navigation.goBack()} />
-      <Button title="Go to Home" onPress={() => navigation.navigate("Home")} />
-    </View>
-  );
-}
-```
-
-**14. Kustomisasi Header Stack Navigator**
-
-```javascript
-<Stack.Navigator
-  screenOptions={{
-    headerStyle: {
-      backgroundColor: "#6200ee",
-    },
-    headerTintColor: "#fff",
-    headerTitleStyle: {
-      fontWeight: "bold",
-    },
-  }}
->
-  <Stack.Screen
-    name="Home"
-    component={HomeScreen}
-    options={{ title: "Beranda" }}
-  />
-  <Stack.Screen
-    name="Details"
-    component={DetailsScreen}
-    options={{ title: "Detail Produk" }}
-  />
-</Stack.Navigator>
-```
-
-**15. Menambahkan Button pada Header**
-
-```javascript
-function HomeScreen({ navigation }) {
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Button
-          onPress={() => alert("Button clicked!")}
-          title="Info"
-          color="#fff"
-        />
-      ),
-    });
-  }, [navigation]);
-
-  return (
-    <View style={styles.container}>
-      <Text>Home Screen</Text>
-    </View>
-  );
-}
-```
-
-**16. Styling Header (Background, Tint Color)**
-
-```javascript
-<Stack.Screen
-  name="Profile"
-  component={ProfileScreen}
+```typescript
+<Tabs.Screen
+  name="notifications"
   options={{
-    title: "Profil Saya",
-    headerStyle: {
-      backgroundColor: "#f4511e",
-    },
-    headerTintColor: "#fff",
-    headerTitleStyle: {
-      fontWeight: "bold",
-      fontSize: 20,
-    },
-    headerShadowVisible: false, // Remove shadow
+    title: "Notifications",
+    tabBarBadge: 3,
+    tabBarBadgeStyle: { backgroundColor: "red" },
+    tabBarIcon: ({ color, size }) => (
+      <Ionicons name="notifications" size={size} color={color} />
+    ),
   }}
 />
 ```
 
-**17. Menyembunyikan Header pada Screen Tertentu**
+---
 
-```javascript
-<Stack.Navigator>
-  <Stack.Screen
-    name="Splash"
-    component={SplashScreen}
-    options={{ headerShown: false }}
-  />
-  <Stack.Screen
-    name="Login"
-    component={LoginScreen}
-    options={{ headerShown: false }}
-  />
-  <Stack.Screen name="Home" component={HomeScreen} />
-</Stack.Navigator>
+## **Nested Navigation: Tab dengan Stack**
+
+```
+app/
+├── _layout.tsx
+├── (tabs)/
+│   ├── _layout.tsx
+│   ├── index.tsx          # Home tab
+│   ├── home/
+│   │   ├── details.tsx    # Stack inside home tab
+│   │   └── settings.tsx
+│   └── profile.tsx
 ```
 
 ---
 
-### Tab Navigation
+```typescript
+// File: app/(tabs)/home/details.tsx
+import { View, Text } from "react-native";
+import { useRouter } from "expo-router";
 
-**18. Konsep Bottom Tab Navigation**
+export default function HomeDetails() {
+  const router = useRouter();
 
-Bottom Tab Navigation menampilkan menu navigasi di bagian bawah layar, memungkinkan akses cepat ke section utama aplikasi. Pola ini umum digunakan untuk aplikasi dengan 3-5 fitur utama seperti Home, Search, Favorites, Profile. Tab tetap visible di semua screen dalam tab navigator tersebut.
-
-**19. Instalasi @react-navigation/bottom-tabs**
-
-```bash
-npm install @react-navigation/bottom-tabs
-```
-
-Untuk icons, install icon library:
-
-```bash
-npx expo install @expo/vector-icons
-```
-
-**20. Membuat Bottom Tab Navigator**
-
-```javascript
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
-const Tab = createBottomTabNavigator();
-
-function MyTabs() {
   return (
-    <Tab.Navigator>
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Search" component={SearchScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
-    </Tab.Navigator>
-  );
-}
-
-export default function App() {
-  return (
-    <NavigationContainer>
-      <MyTabs />
-    </NavigationContainer>
-  );
-}
-```
-
-**21. Menambahkan Icons pada Tab**
-
-```javascript
-import { Ionicons } from "@expo/vector-icons";
-
-function MyTabs() {
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-
-          if (route.name === "Home") {
-            iconName = focused ? "home" : "home-outline";
-          } else if (route.name === "Search") {
-            iconName = focused ? "search" : "search-outline";
-          } else if (route.name === "Profile") {
-            iconName = focused ? "person" : "person-outline";
-          }
-
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-      })}
-    >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Search" component={SearchScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
-    </Tab.Navigator>
-  );
-}
-```
-
-**22. Kustomisasi Tab Bar (Warna, Style)**
-
-```javascript
-<Tab.Navigator
-  screenOptions={{
-    tabBarActiveTintColor: "#6200ee",
-    tabBarInactiveTintColor: "gray",
-    tabBarStyle: {
-      backgroundColor: "#ffffff",
-      borderTopWidth: 1,
-      borderTopColor: "#e0e0e0",
-      height: 60,
-      paddingBottom: 5,
-    },
-    tabBarLabelStyle: {
-      fontSize: 12,
-      fontWeight: "600",
-    },
-  }}
->
-  <Tab.Screen name="Home" component={HomeScreen} />
-  <Tab.Screen name="Search" component={SearchScreen} />
-  <Tab.Screen name="Profile" component={ProfileScreen} />
-</Tab.Navigator>
-```
-
-**23. Badge pada Tab Icons**
-
-```javascript
-<Tab.Navigator>
-  <Tab.Screen
-    name="Home"
-    component={HomeScreen}
-    options={{
-      tabBarBadge: 3,
-      tabBarIcon: ({ color, size }) => (
-        <Ionicons name="home" size={size} color={color} />
-      ),
-    }}
-  />
-  <Tab.Screen
-    name="Notifications"
-    component={NotificationsScreen}
-    options={{
-      tabBarBadge: 10,
-      tabBarBadgeStyle: { backgroundColor: "red" },
-      tabBarIcon: ({ color, size }) => (
-        <Ionicons name="notifications" size={size} color={color} />
-      ),
-    }}
-  />
-</Tab.Navigator>
-```
-
-**24. Tab Navigator dengan Stack Navigator**
-
-```javascript
-const HomeStack = createNativeStackNavigator();
-const ProfileStack = createNativeStackNavigator();
-
-function HomeStackScreen() {
-  return (
-    <HomeStack.Navigator>
-      <HomeStack.Screen name="HomeMain" component={HomeScreen} />
-      <HomeStack.Screen name="Details" component={DetailsScreen} />
-    </HomeStack.Navigator>
-  );
-}
-
-function ProfileStackScreen() {
-  return (
-    <ProfileStack.Navigator>
-      <ProfileStack.Screen name="ProfileMain" component={ProfileScreen} />
-      <ProfileStack.Screen name="Settings" component={SettingsScreen} />
-    </ProfileStack.Navigator>
-  );
-}
-
-function App() {
-  return (
-    <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen
-          name="Home"
-          component={HomeStackScreen}
-          options={{ headerShown: false }}
-        />
-        <Tab.Screen
-          name="Profile"
-          component={ProfileStackScreen}
-          options={{ headerShown: false }}
-        />
-      </Tab.Navigator>
-    </NavigationContainer>
+    <View style={styles.container}>
+      <Text>Home Details (dalam tab)</Text>
+      <Button title="Back" onPress={() => router.back()} />
+    </View>
   );
 }
 ```
 
 ---
 
-### Drawer Navigation
+# Drawer Navigation dengan Expo Router
 
-**25. Konsep Drawer Navigation (Side Menu)**
+---
 
-Drawer Navigation adalah side menu yang muncul dari samping (biasanya kiri) ketika di-swipe atau tombol menu ditekan. Cocok untuk aplikasi dengan banyak menu navigasi yang tidak perlu akses cepat. Drawer dapat menampilkan profil user, menu navigasi, dan action buttons.
+## **Drawer Navigation menggunakan Groups**
 
-**26. Instalasi @react-navigation/drawer**
+Drawer navigation dibuat menggunakan folder dengan prefix `+html`, atau dengan Drawer component dari expo-router. Struktur folder:
+
+```
+app/
+├── _layout.tsx
+├── +not-found.tsx
+└── (drawer)/
+    ├── _layout.tsx     # Drawer configuration
+    ├── index.tsx       # Home
+    ├── settings.tsx    # Settings
+    └── about.tsx       # About
+```
+
+---
+
+## **Instalasi Dependencies untuk Drawer**
 
 ```bash
-npm install @react-navigation/drawer
 npx expo install react-native-gesture-handler react-native-reanimated
 ```
 
-Tambahkan plugin di babel.config.js:
+Update `babel.config.js`:
 
 ```javascript
-module.exports = {
-  presets: ["babel-preset-expo"],
-  plugins: ["react-native-reanimated/plugin"],
+module.exports = function (api) {
+  api.cache(true);
+  return {
+    presets: ["babel-preset-expo"],
+    plugins: ["react-native-reanimated/plugin"],
+  };
 };
 ```
 
-**27. Membuat Drawer Navigator**
+---
 
-```javascript
-import { createDrawerNavigator } from "@react-navigation/drawer";
+## **Membuat Drawer Layout**
+
+```typescript
+// File: app/(drawer)/_layout.tsx
+import { Drawer } from "expo-router/drawer";
 import { Ionicons } from "@expo/vector-icons";
 
-const Drawer = createDrawerNavigator();
-
-function MyDrawer() {
+export default function DrawerLayout() {
   return (
-    <Drawer.Navigator>
+    <Drawer
+      screenOptions={{
+        drawerActiveTintColor: "#6200ee",
+        drawerInactiveTintColor: "gray",
+        headerShown: true,
+      }}
+    >
       <Drawer.Screen
-        name="Home"
-        component={HomeScreen}
+        name="index"
         options={{
+          drawerLabel: "Home",
+          title: "Home",
           drawerIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),
         }}
       />
       <Drawer.Screen
-        name="Profile"
-        component={ProfileScreen}
+        name="settings"
         options={{
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{
+          drawerLabel: "Settings",
+          title: "Settings",
           drawerIcon: ({ color, size }) => (
             <Ionicons name="settings-outline" size={size} color={color} />
           ),
         }}
       />
-    </Drawer.Navigator>
+      <Drawer.Screen
+        name="about"
+        options={{
+          drawerLabel: "About",
+          title: "About",
+          drawerIcon: ({ color, size }) => (
+            <Ionicons
+              name="information-circle-outline"
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+    </Drawer>
   );
 }
 ```
 
-**28. Kustomisasi Drawer Content**
+---
 
-```javascript
+## **Custom Drawer Content**
+
+```typescript
 import {
   DrawerContentScrollView,
   DrawerItemList,
 } from "@react-navigation/drawer";
 import { View, Text, Image, StyleSheet } from "react-native";
 
-function CustomDrawerContent(props) {
+function CustomDrawerContent(props: any) {
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerHeader}>
@@ -565,19 +651,26 @@ function CustomDrawerContent(props) {
         <Text style={styles.userName}>John Doe</Text>
         <Text style={styles.userEmail}>john@example.com</Text>
       </View>
+
       <DrawerItemList {...props} />
+
       <View style={styles.drawerFooter}>
         <Text style={styles.version}>Version 1.0.0</Text>
       </View>
     </DrawerContentScrollView>
   );
 }
+```
 
+---
+
+```javascript
 const styles = StyleSheet.create({
   drawerHeader: {
     padding: 20,
     backgroundColor: "#6200ee",
     alignItems: "center",
+    marginBottom: 10,
   },
   profileImage: {
     width: 80,
@@ -598,280 +691,322 @@ const styles = StyleSheet.create({
     padding: 20,
     borderTopWidth: 1,
     borderTopColor: "#e0e0e0",
+    marginTop: 10,
   },
   version: {
     color: "gray",
     fontSize: 12,
   },
 });
+```
 
-function MyDrawer() {
+---
+
+## **Menggunakan Custom Drawer**
+
+```typescript
+import { Drawer } from "expo-router/drawer";
+import CustomDrawerContent from "@/components/CustomDrawerContent";
+
+export default function DrawerLayout() {
   return (
-    <Drawer.Navigator
+    <Drawer
       drawerContent={(props) => <CustomDrawerContent {...props} />}
+      screenOptions={{
+        drawerActiveTintColor: "#6200ee",
+      }}
     >
-      <Drawer.Screen name="Home" component={HomeScreen} />
-      <Drawer.Screen name="Profile" component={ProfileScreen} />
-    </Drawer.Navigator>
+      <Drawer.Screen name="index" options={{ title: "Home" }} />
+      <Drawer.Screen name="settings" options={{ title: "Settings" }} />
+    </Drawer>
   );
 }
 ```
 
-**29. Kombinasi Stack, Tab, dan Drawer Navigation**
+---
 
-```javascript
-// Stack Navigators
-const HomeStack = createNativeStackNavigator();
-const ProfileStack = createNativeStackNavigator();
+## **Membuka Drawer Secara Programmatic**
 
-function HomeStackScreen() {
+```typescript
+import { View, Button } from "react-native";
+import { useNavigation } from "expo-router";
+import { DrawerActions } from "@react-navigation/native";
+
+export default function HomeScreen() {
+  const navigation = useNavigation();
+
+  const openDrawer = () => {
+    navigation.dispatch(DrawerActions.openDrawer());
+  };
+
+  const closeDrawer = () => {
+    navigation.dispatch(DrawerActions.closeDrawer());
+  };
+
+  const toggleDrawer = () => {
+    navigation.dispatch(DrawerActions.toggleDrawer());
+  };
+
   return (
-    <HomeStack.Navigator>
-      <HomeStack.Screen name="HomeMain" component={HomeScreen} />
-      <HomeStack.Screen name="Details" component={DetailsScreen} />
-    </HomeStack.Navigator>
+    <View style={styles.container}>
+      <Button title="Open Drawer" onPress={openDrawer} />
+      <Button title="Close Drawer" onPress={closeDrawer} />
+      <Button title="Toggle Drawer" onPress={toggleDrawer} />
+    </View>
   );
 }
+```
 
-function ProfileStackScreen() {
+---
+
+# Kombinasi Navigation Patterns
+
+---
+
+## **Struktur Folder untuk Kombinasi Tab + Stack + Drawer**
+
+```
+app/
+├── _layout.tsx              # Root layout (Drawer)
+├── (drawer)/
+│   ├── _layout.tsx          # Drawer config
+│   ├── (tabs)/              # Tab navigation
+│   │   ├── _layout.tsx      # Tab config
+│   │   ├── index.tsx        # Home tab
+│   │   ├── search.tsx       # Search tab
+│   │   ├── profile/         # Profile stack
+│   │   │   ├── index.tsx
+│   │   │   └── edit.tsx
+│   ├── settings.tsx         # Settings (drawer item)
+│   └── about.tsx            # About (drawer item)
+```
+
+---
+
+## **Root Layout dengan Drawer**
+
+```typescript
+// File: app/_layout.tsx
+import { Stack } from "expo-router";
+
+export default function RootLayout() {
   return (
-    <ProfileStack.Navigator>
-      <ProfileStack.Screen name="ProfileMain" component={ProfileScreen} />
-      <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} />
-    </ProfileStack.Navigator>
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(drawer)" />
+    </Stack>
   );
 }
+```
 
-// Tab Navigator
-const Tab = createBottomTabNavigator();
+---
 
-function TabNavigator() {
+## **Drawer Layout**
+
+```typescript
+// File: app/(drawer)/_layout.tsx
+import { Drawer } from "expo-router/drawer";
+import { Ionicons } from "@expo/vector-icons";
+
+export default function DrawerLayout() {
   return (
-    <Tab.Navigator>
-      <Tab.Screen
-        name="HomeTab"
-        component={HomeStackScreen}
+    <Drawer>
+      <Drawer.Screen
+        name="(tabs)"
         options={{
-          headerShown: false,
-          tabBarLabel: "Home",
+          drawerLabel: "Main App",
+          title: "Home",
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="apps" size={size} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="settings"
+        options={{
+          drawerLabel: "Settings",
+          title: "Settings",
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="settings-outline" size={size} color={color} />
+          ),
+        }}
+      />
+    </Drawer>
+  );
+}
+```
+
+---
+
+## **Tab Layout di dalam Drawer**
+
+```typescript
+// File: app/(drawer)/(tabs)/_layout.tsx
+import { Tabs } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+
+export default function TabLayout() {
+  return (
+    <Tabs>
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
         }}
       />
-      <Tab.Screen
-        name="ProfileTab"
-        component={ProfileStackScreen}
+      <Tabs.Screen
+        name="search"
         options={{
-          headerShown: false,
-          tabBarLabel: "Profile",
+          title: "Search",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} />
+            <Ionicons name="search" size={size} color={color} />
           ),
         }}
       />
-    </Tab.Navigator>
-  );
-}
-
-// Drawer Navigator
-const Drawer = createDrawerNavigator();
-
-function App() {
-  return (
-    <NavigationContainer>
-      <Drawer.Navigator>
-        <Drawer.Screen
-          name="MainApp"
-          component={TabNavigator}
-          options={{ title: "My App" }}
-        />
-        <Drawer.Screen name="Settings" component={SettingsScreen} />
-        <Drawer.Screen name="About" component={AboutScreen} />
-      </Drawer.Navigator>
-    </NavigationContainer>
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          href: null, // Hide from tab bar
+        }}
+      />
+    </Tabs>
   );
 }
 ```
-
-**30. Best Practices Struktur Navigasi Aplikasi**
-
-Struktur file yang direkomendasikan:
-
-```
-src/
-├── navigation/
-│   ├── AppNavigator.js       // Root navigator
-│   ├── StackNavigator.js     // Stack navigators
-│   ├── TabNavigator.js       // Tab navigator
-│   └── DrawerNavigator.js    // Drawer navigator
-├── screens/
-│   ├── HomeScreen.js
-│   ├── DetailsScreen.js
-│   ├── ProfileScreen.js
-│   └── SettingsScreen.js
-└── components/
-    └── CustomDrawerContent.js
-```
-
-Contoh AppNavigator.js:
-
-```javascript
-import { NavigationContainer } from "@react-navigation/native";
-import MainDrawer from "./DrawerNavigator";
-
-export default function AppNavigator() {
-  return (
-    <NavigationContainer>
-      <MainDrawer />
-    </NavigationContainer>
-  );
-}
-```
-
-Best practices:
-
-- Pisahkan navigator berdasarkan tipe (Stack, Tab, Drawer)
-- Gunakan lazy loading untuk screen yang jarang diakses
-- Hindari nesting navigator terlalu dalam (max 3 level)
-- Gunakan TypeScript untuk type safety pada params
-- Simpan navigation state untuk deep linking
-- Test navigasi flow secara menyeluruh
 
 ---
 
-## Quiz Pilihan Berganda
+## Quiz
 
 ---
 
 ## Soal 1
 
-Library navigasi mana yang paling populer dan direkomendasikan untuk React Native?
+Apa keunggulan utama dari Expo Router dibandingkan React Navigation tradisional?
 
-A. React Router Native
-B. React Native Navigation (Wix)
-C. React Navigation
-D. Native Navigator
+A. Lebih cepat dalam rendering
+B. File-based routing yang lebih intuitif
+C. Ukuran bundle yang lebih kecil
+D. Support lebih banyak platform
 
-**Jawaban: C**
+<!-- **Jawaban: B** -->
 
 ---
 
 ## Soal 2
 
-Apa fungsi dari `NavigationContainer` dalam React Navigation?
+Di mana file-file screen/route ditempatkan dalam Expo Router?
 
-A. Untuk membuat tab navigation
-B. Untuk membungkus seluruh struktur navigasi aplikasi
-C. Untuk styling navigation bar
-D. Untuk membuat drawer menu
+A. Di folder `src`
+B. Di folder `screens`
+C. Di folder `app`
+D. Di folder `routes`
 
-**Jawaban: B**
+<!-- **Jawaban: C** -->
 
 ---
 
 ## Soal 3
 
-Bagaimana cara mengirim parameter dari satu screen ke screen lain menggunakan Stack Navigation?
+Bagaimana cara membuat dynamic route di Expo Router?
 
-A. `navigation.navigate('Details', { id: 1 })`
-B. `navigation.send('Details', id: 1)`
-C. `navigation.push({ screen: 'Details', params: { id: 1 } })`
-D. `navigation.goto('Details', id: 1)`
+A. Membuat file dengan nama `dynamic.tsx`
+B. Membuat file dengan nama `[id].tsx`
+C. Membuat file dengan nama `{id}.tsx`
+D. Membuat file dengan nama `<id>.tsx`
 
-**Jawaban: A**
+<!-- **Jawaban: B** -->
 
 ---
 
 ## Soal 4
 
-Bagaimana cara mengakses parameter yang dikirim ke sebuah screen?
+Component apa yang digunakan untuk navigasi deklaratif di Expo Router?
 
-A. `navigation.params.itemId`
-B. `route.params.itemId`
-C. `props.params.itemId`
-D. `screen.params.itemId`
+A. `<Navigate>`
+B. `<Router>`
+C. `<Link>`
+D. `<Navigation>`
 
-**Jawaban: B**
+<!-- **Jawaban: C** -->
 
 ---
 
 ## Soal 5
 
-Apa fungsi dari `navigation.goBack()` pada Stack Navigation?
+Hook apa yang digunakan untuk navigasi programmatic di Expo Router?
 
-A. Kembali ke screen pertama
-B. Menutup aplikasi
-C. Kembali ke screen sebelumnya dalam stack
-D. Refresh screen saat ini
+A. `useNavigation()`
+B. `useRouter()`
+C. `useRoute()`
+D. `useNavigate()`
 
-**Jawaban: C**
+<!-- **Jawaban: B** -->
 
 ---
 
 ## Soal 6
 
-Berapa jumlah tab yang ideal untuk Bottom Tab Navigation?
+Bagaimana cara membuat tab navigation di Expo Router?
 
-A. 1-2 tab
-B. 3-5 tab
-C. 6-8 tab
-D. Tidak terbatas
+A. Menggunakan file `tabs.tsx`
+B. Menggunakan folder dengan nama `(tabs)`
+C. Menggunakan component `<Tabs>`
+D. Import dari `@react-navigation/tabs`
 
-**Jawaban: B**
+<!-- **Jawaban: B** -->
 
 ---
 
 ## Soal 7
 
-Library apa yang digunakan untuk menambahkan icons pada Tab Navigator?
+Hook apa yang digunakan untuk mengakses parameter route di Expo Router?
 
-A. react-native-icons
-B. @expo/vector-icons
-C. react-icons
-D. icon-library
+A. `useParams()`
+B. `useRouteParams()`
+C. `useLocalSearchParams()`
+D. `useSearchParams()`
 
-**Jawaban: B**
+<!-- **Jawaban: C** -->
 
 ---
 
 ## Soal 8
 
-Bagaimana cara menyembunyikan header pada screen tertentu dalam Stack Navigator?
+File apa yang digunakan untuk konfigurasi layout dalam Expo Router?
 
-A. `options={{ hideHeader: true }}`
-B. `options={{ header: false }}`
-C. `options={{ headerShown: false }}`
-D. `options={{ showHeader: false }}`
+A. `config.tsx`
+B. `layout.tsx`
+C. `_layout.tsx`
+D. `index.tsx`
 
-**Jawaban: C**
+<!-- **Jawaban: C** -->
 
 ---
 
 ## Soal 9
 
-Apa yang harus ditambahkan di babel.config.js untuk menggunakan Drawer Navigation?
+Bagaimana cara mengakses drawer navigation secara programmatic di Expo Router?
 
-A. `react-navigation/plugin`
-B. `react-native-reanimated/plugin`
-C. `drawer-navigation/plugin`
-D. `gesture-handler/plugin`
+A. `navigation.openDrawer()`
+B. `navigation.dispatch(DrawerActions.openDrawer())`
+C. `router.push('/drawer')`
+D. `drawer.open()`
 
-**Jawaban: B**
+<!-- **Jawaban: B** -->
 
 ---
 
 ## Soal 10
 
-Berapa level maksimum nesting navigator yang direkomendasikan sebagai best practice?
+Apa kegunaan dari folder groups dengan tanda kurung seperti `(tabs)` atau `(drawer)` di Expo Router?
 
-A. 1 level
-B. 2 level
-C. 3 level
-D. 5 level
+A. Untuk membuat route tersembunyi
+B. Untuk grouping layout tanpa menambah path segment di URL
+C. Untuk membuat nested folders
+D. Untuk membuat dynamic routes
 
-**Jawaban: C**
-
----
-
-**Selamat! Anda telah menyelesaikan materi Navigasi pada React Native** 🎉
+<!-- **Jawaban: B** -->
