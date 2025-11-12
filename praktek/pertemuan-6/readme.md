@@ -1,10 +1,10 @@
-# Latihan Praktek Pertemuan 6: Navigasi pada React Native (Stack, Tab, Drawer)
+# Latihan Praktek Pertemuan 6: Navigasi dengan Expo Router (File-based Routing)
 
 ## Petunjuk Umum
 
-- Setiap soal dibuat dalam project terpisah atau dalam satu project dengan struktur folder yang jelas
-- Gunakan Expo CLI untuk memudahkan setup: `npx create-expo-app nama-project`
-- Install dependencies yang diperlukan (React Navigation dan library pendukung)
+- Setiap soal dibuat dalam project terpisah menggunakan Expo Router
+- Gunakan file-based routing dengan struktur folder `app/`
+- Manfaatkan fitur layout groups untuk tab dan drawer navigation
 - Test setiap fitur navigasi untuk memastikan berfungsi dengan baik
 - Perhatikan user experience dan animasi transisi
 
@@ -12,118 +12,235 @@
 
 ## Setup Awal
 
-Sebelum mengerjakan soal, install dependencies yang diperlukan:
+Sebelum mengerjakan soal, buat project baru dengan Expo Router:
 
 ```bash
-# Install core library
-npm install @react-navigation/native
+# Membuat project baru dengan template tabs (recommended)
+npx create-expo-app@latest nama-project --template tabs
 
-# Install dependencies untuk Expo
-npx expo install react-native-screens react-native-safe-area-context
+# Atau dari blank project
+npx create-expo-app@latest nama-project
+cd nama-project
 
-# Install navigator yang dibutuhkan
-npm install @react-navigation/native-stack
-npm install @react-navigation/bottom-tabs
-npm install @react-navigation/drawer
+# Install Expo Router dan dependencies
+npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar
 
-# Install dependencies drawer
+# Install dependencies untuk drawer navigation
 npx expo install react-native-gesture-handler react-native-reanimated
 
 # Install icons
 npx expo install @expo/vector-icons
 ```
 
-Tambahkan plugin di `babel.config.js`:
+Update `babel.config.js`:
 
 ```javascript
-module.exports = {
-  presets: ["babel-preset-expo"],
-  plugins: ["react-native-reanimated/plugin"],
+module.exports = function (api) {
+  api.cache(true);
+  return {
+    presets: ["babel-preset-expo"],
+    plugins: ["react-native-reanimated/plugin"],
+  };
 };
 ```
 
----
+Update `app.json`:
 
-## Soal 1: Implementasi Stack Navigation Sederhana
-
-Buatlah aplikasi dengan Stack Navigation yang memiliki 3 screen:
-
-1. **HomeScreen**: Tampilan welcome dengan tombol navigate ke About dan Contact
-2. **AboutScreen**: Halaman about dengan deskripsi aplikasi dan tombol back
-3. **ContactScreen**: Halaman contact dengan form sederhana
-
-**Spesifikasi:**
-
-- Gunakan `@react-navigation/native-stack`
-- Setiap screen memiliki header yang dapat dikustomisasi
-- HomeScreen memiliki 2 tombol untuk navigate ke screen lain
-- AboutScreen dan ContactScreen memiliki tombol back
-- Tambahkan styling yang menarik pada setiap screen
-
-**Komponen yang harus dibuat:**
-
-- App.js (setup NavigationContainer dan Stack.Navigator)
-- screens/HomeScreen.js
-- screens/AboutScreen.js
-- screens/ContactScreen.js
-
----
-
-## Soal 2: Passing Data Antar Screen
-
-Buatlah aplikasi product catalog dengan fitur:
-
-1. **ProductListScreen**: Menampilkan list produk (minimal 5 produk)
-2. **ProductDetailScreen**: Menampilkan detail produk yang dipilih
-
-**Spesifikasi:**
-
-- Setiap produk memiliki: id, nama, harga, deskripsi, dan gambar (gunakan placeholder)
-- Ketika produk diklik, navigate ke detail dan kirim data produk
-- DetailScreen menampilkan semua informasi produk
-- Tambahkan tombol "Add to Cart" di detail screen
-- Gunakan FlatList untuk render list produk
-- Styling card product yang menarik
-
-**Data yang dikirim:**
-
-```javascript
+```json
 {
-  id: 1,
-  name: "Product Name",
-  price: 150000,
-  description: "Product description here",
-  image: "url"
+  "expo": {
+    "scheme": "myapp",
+    "plugins": ["expo-router"]
+  }
 }
 ```
 
 ---
 
-## Soal 3: Kustomisasi Header Stack Navigator
+## Soal 1: Implementasi Stack Navigation Sederhana dengan Expo Router
 
-Buatlah aplikasi dengan Stack Navigation yang memiliki header custom:
+Buatlah aplikasi dengan Stack Navigation yang memiliki 3 screen:
 
-1. **HomeScreen**: Header dengan background gradient (simulasi dengan warna solid)
-2. **ProfileScreen**: Header dengan button "Edit" di kanan
-3. **SettingsScreen**: Header dengan icon settings dan tanpa back button text
+1. **Home (index)**: Tampilan welcome dengan link navigate ke About dan Contact
+2. **About**: Halaman about dengan deskripsi aplikasi dan tombol back
+3. **Contact**: Halaman contact dengan form sederhana
+
+**Struktur Folder:**
+
+```
+app/
+├── _layout.tsx          # Root layout dengan Stack
+├── index.tsx            # Home screen
+├── about.tsx            # About screen
+└── contact.tsx          # Contact screen
+```
 
 **Spesifikasi:**
 
-- Kustomisasi `headerStyle`, `headerTintColor`, `headerTitleStyle`
-- Tambahkan `headerRight` button di ProfileScreen
-- Gunakan `headerLeft` untuk custom back button
-- Tambahkan `headerTitle` dengan custom component
-- Header height dan shadow dapat dikustomisasi
+- Gunakan `<Link>` component untuk navigasi deklaratif
+- Gunakan `useRouter()` hook untuk navigasi programmatic
+- Setiap screen memiliki header yang dapat dikustomisasi di `_layout.tsx`
+- Home screen memiliki 2 link/button untuk navigate ke screen lain
+- About dan Contact screen memiliki tombol back
+- Tambahkan styling yang menarik pada setiap screen
+
+**Contoh `_layout.tsx`:**
+
+```typescript
+import { Stack } from "expo-router";
+
+export default function Layout() {
+  return (
+    <Stack
+      screenOptions={{
+        headerStyle: { backgroundColor: "#6200ee" },
+        headerTintColor: "#fff",
+      }}
+    >
+      <Stack.Screen name="index" options={{ title: "Home" }} />
+      <Stack.Screen name="about" options={{ title: "About Us" }} />
+      <Stack.Screen name="contact" options={{ title: "Contact" }} />
+    </Stack>
+  );
+}
+```
+
+---
+
+## Soal 2: Passing Data Antar Screen dengan Dynamic Routes
+
+Buatlah aplikasi product catalog dengan fitur:
+
+1. **Product List**: Menampilkan list produk (minimal 5 produk)
+2. **Product Detail**: Menampilkan detail produk yang dipilih (Dynamic Route)
+
+**Struktur Folder:**
+
+```
+app/
+├── _layout.tsx
+├── index.tsx              # Product List
+└── product/
+    └── [id].tsx           # Dynamic route untuk detail
+```
+
+**Spesifikasi:**
+
+- Setiap produk memiliki: id, nama, harga, deskripsi, dan gambar (gunakan placeholder)
+- Ketika produk diklik, navigate ke `/product/[id]` dengan parameter
+- Gunakan `useLocalSearchParams()` untuk mengakses parameter di detail screen
+- DetailScreen menampilkan semua informasi produk
+- Tambahkan tombol "Add to Cart" di detail screen
+- Gunakan FlatList untuk render list produk
+- Styling card product yang menarik
+
+**Contoh navigasi:**
+
+```typescript
+// Di Product List (index.tsx)
+import { Link } from "expo-router";
+
+<Link
+  href={{
+    pathname: "/product/[id]",
+    params: {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      description: product.description,
+    },
+  }}
+>
+  View Details
+</Link>;
+
+// Di Product Detail ([id].tsx)
+import { useLocalSearchParams } from "expo-router";
+
+const { id, name, price, description } = useLocalSearchParams();
+```
+
+---
+
+## Soal 3: Kustomisasi Header dengan Expo Router
+
+Buatlah aplikasi dengan Stack Navigation yang memiliki header custom:
+
+1. **Home**: Header dengan background warna custom
+2. **Profile**: Header dengan button "Edit" di kanan
+3. **Settings**: Header dengan icon settings dan custom styling
+
+**Struktur Folder:**
+
+```
+app/
+├── _layout.tsx
+├── index.tsx
+├── profile.tsx
+└── settings.tsx
+```
+
+**Spesifikasi:**
+
+- Kustomisasi header di `_layout.tsx` menggunakan `screenOptions`
+- Tambahkan `headerRight` button di Profile screen
+- Gunakan `headerLeft` untuk custom back button (opsional)
 - Setiap screen memiliki styling header yang berbeda
+- Kustomisasi `headerStyle`, `headerTintColor`, `headerTitleStyle`
+
+**Contoh \_layout.tsx:**
+
+```typescript
+import { Stack } from "expo-router";
+import { TouchableOpacity, Text } from "react-native";
+import { useRouter } from "expo-router";
+
+export default function Layout() {
+  const router = useRouter();
+
+  return (
+    <Stack>
+      <Stack.Screen
+        name="index"
+        options={{
+          title: "Home",
+          headerStyle: { backgroundColor: "#6200ee" },
+          headerTintColor: "#fff",
+        }}
+      />
+      <Stack.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          headerStyle: { backgroundColor: "#03dac6" },
+          headerTintColor: "#000",
+          headerRight: () => (
+            <TouchableOpacity onPress={() => router.push("/edit-profile")}>
+              <Text style={{ color: "#000", marginRight: 15 }}>Edit</Text>
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          headerShown: true,
+        }}
+      />
+    </Stack>
+  );
+}
+```
 
 **Bonus:**
 
-- Implementasikan animated header
+- Implementasikan animated header dengan `useLayoutEffect`
 - Tambahkan search bar di header
 
 ---
 
-## Soal 4: Bottom Tab Navigation dengan Icons
+## Soal 4: Bottom Tab Navigation dengan Expo Router
 
 Buatlah aplikasi dengan Bottom Tab Navigation yang memiliki 4 tabs:
 
@@ -132,8 +249,22 @@ Buatlah aplikasi dengan Bottom Tab Navigation yang memiliki 4 tabs:
 3. **Favorites**: Icon heart, menampilkan favorite items
 4. **Profile**: Icon person, menampilkan user profile
 
+**Struktur Folder:**
+
+```
+app/
+├── _layout.tsx           # Root layout
+└── (tabs)/
+    ├── _layout.tsx       # Tab configuration
+    ├── index.tsx         # Home tab
+    ├── search.tsx        # Search tab
+    ├── favorites.tsx     # Favorites tab
+    └── profile.tsx       # Profile tab
+```
+
 **Spesifikasi:**
 
+- Gunakan folder groups `(tabs)` untuk tab navigation
 - Gunakan `@expo/vector-icons` (Ionicons)
 - Icon berubah (outline/filled) sesuai active state
 - Kustomisasi `tabBarActiveTintColor` dan `tabBarInactiveTintColor`
@@ -141,12 +272,43 @@ Buatlah aplikasi dengan Bottom Tab Navigation yang memiliki 4 tabs:
 - Styling tab bar dengan shadow dan border
 - Tab bar height minimal 60px
 
-**Icons yang digunakan:**
+**Contoh (tabs)/\_layout.tsx:**
 
-- Home: home/home-outline
-- Search: search/search-outline
-- Favorites: heart/heart-outline
-- Profile: person/person-outline
+```typescript
+import { Tabs } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+
+export default function TabLayout() {
+  return (
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: "#6200ee",
+        tabBarInactiveTintColor: "gray",
+        tabBarStyle: {
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+      {/* Tambahkan tab lainnya */}
+    </Tabs>
+  );
+}
+```
 
 ---
 
@@ -159,13 +321,52 @@ Buatlah aplikasi e-commerce dengan tab navigation yang menampilkan badge:
 3. **Notifications Tab**: Badge menampilkan jumlah notifikasi belum dibaca
 4. **Account Tab**: Tanpa badge
 
+**Struktur Folder:**
+
+```
+app/
+├── _layout.tsx
+└── (tabs)/
+    ├── _layout.tsx
+    ├── index.tsx         # Home
+    ├── cart.tsx          # Cart
+    ├── notifications.tsx # Notifications
+    └── account.tsx       # Account
+```
+
 **Spesifikasi:**
 
-- Gunakan state management untuk mengelola jumlah badge
+- Gunakan React state atau Context API untuk mengelola jumlah badge
 - Badge dapat diupdate dengan tombol (simulasi add to cart, dll)
 - Badge hilang ketika jumlah = 0
-- Kustomisasi warna dan style badge
+- Kustomisasi warna dan style badge menggunakan `tabBarBadge` dan `tabBarBadgeStyle`
 - Implementasikan counter logic yang benar
+
+**Contoh implementasi badge:**
+
+```typescript
+import { Tabs } from "expo-router";
+import { useState } from "react";
+
+export default function TabLayout() {
+  const [cartCount, setCartCount] = useState(3);
+  const [notifCount, setNotifCount] = useState(5);
+
+  return (
+    <Tabs>
+      <Tabs.Screen
+        name="cart"
+        options={{
+          title: "Cart",
+          tabBarBadge: cartCount > 0 ? cartCount : undefined,
+          tabBarBadgeStyle: { backgroundColor: "red" },
+        }}
+      />
+      {/* Tab lainnya */}
+    </Tabs>
+  );
+}
+```
 
 **Fungsi yang harus ada:**
 
@@ -175,43 +376,62 @@ Buatlah aplikasi e-commerce dengan tab navigation yang menampilkan badge:
 
 ---
 
-## Soal 6: Kombinasi Stack dan Tab Navigation
+## Soal 6: Kombinasi Stack dan Tab Navigation dengan Expo Router
 
-Buatlah aplikasi dengan struktur navigasi kompleks:
+Buatlah aplikasi dengan struktur navigasi kompleks menggunakan nested folders:
 
-**Struktur:**
+**Struktur Folder:**
 
 ```
-Tab Navigator (Bottom)
-├── Home Tab (Stack)
-│   ├── HomeScreen
-│   └── DetailsScreen
-├── Search Tab (Stack)
-│   ├── SearchScreen
-│   └── ResultScreen
-└── Profile Tab (Stack)
-    ├── ProfileScreen
-    ├── EditProfileScreen
-    └── SettingsScreen
+app/
+├── _layout.tsx
+└── (tabs)/
+    ├── _layout.tsx
+    ├── index.tsx              # Home tab root
+    ├── home/
+    │   └── details.tsx        # Home details (stack)
+    ├── search.tsx             # Search tab root
+    ├── search/
+    │   └── results.tsx        # Search results (stack)
+    ├── profile.tsx            # Profile tab root
+    └── profile/
+        ├── edit.tsx           # Edit profile (stack)
+        └── settings.tsx       # Settings (stack)
 ```
 
 **Spesifikasi:**
 
-- Setiap tab memiliki stack navigator sendiri
+- Setiap tab dapat memiliki nested routes (stack navigation)
 - Navigasi dalam stack tidak menghilangkan tab bar
 - Back button berfungsi dengan benar di setiap stack
 - Header title disesuaikan per screen
 - Tab icons dengan active state
 - Implementasikan deep navigation (Home → Details → Profile)
 
+**Contoh navigasi ke nested route:**
+
+```typescript
+// Di Home tab (index.tsx)
+import { Link } from "expo-router";
+
+<Link href="/home/details">View Details</Link>;
+
+// Atau dengan router.push
+import { useRouter } from "expo-router";
+const router = useRouter();
+router.push("/home/details");
+```
+
 **Tips:**
 
-- Buat file terpisah untuk setiap StackNavigator
-- Gunakan `headerShown: false` pada tab screen untuk menghindari double header
+- Gunakan folder groups `(tabs)` untuk tab navigator
+- Nested folders otomatis menjadi stack navigation
+- Konfigurasi header di `_layout.tsx` masing-masing folder
+- Gunakan `href={null}` di Tabs.Screen untuk menyembunyikan tab tertentu
 
 ---
 
-## Soal 7: Drawer Navigation (Side Menu)
+## Soal 7: Drawer Navigation dengan Expo Router
 
 Buatlah aplikasi dengan Drawer Navigation yang memiliki:
 
@@ -224,26 +444,64 @@ Buatlah aplikasi dengan Drawer Navigation yang memiliki:
 5. Help & Support
 6. Logout (dengan confirmation alert)
 
+**Struktur Folder:**
+
+```
+app/
+├── _layout.tsx
+└── (drawer)/
+    ├── _layout.tsx           # Drawer configuration
+    ├── index.tsx             # Dashboard
+    ├── profile.tsx           # Profile
+    ├── settings.tsx          # Settings
+    ├── notifications.tsx     # Notifications
+    └── help.tsx              # Help & Support
+```
+
 **Spesifikasi:**
 
-- Setiap menu memiliki icon yang sesuai
-- Drawer header menampilkan profile picture, nama, dan email
-- Drawer footer menampilkan version number
-- Kustomisasi drawer content dengan styling menarik
+- Gunakan folder groups `(drawer)` untuk drawer navigation
+- Setiap menu memiliki icon yang sesuai menggunakan Ionicons
+- Kustomisasi drawer dengan `screenOptions`
+- Active menu item highlighted dengan `drawerActiveTintColor`
 - Drawer width minimal 280px
-- Active menu item highlighted dengan background color
-- Implementasikan logout confirmation
+- Implementasikan logout dengan Alert confirmation
 
-**Drawer Header harus menampilkan:**
+**Contoh (drawer)/\_layout.tsx:**
 
-- Profile image (gunakan placeholder)
-- User name
-- Email
-- Background dengan warna atau gradient
+```typescript
+import { Drawer } from "expo-router/drawer";
+import { Ionicons } from "@expo/vector-icons";
+
+export default function DrawerLayout() {
+  return (
+    <Drawer
+      screenOptions={{
+        drawerActiveTintColor: "#6200ee",
+        drawerInactiveTintColor: "gray",
+        drawerStyle: {
+          width: 280,
+        },
+      }}
+    >
+      <Drawer.Screen
+        name="index"
+        options={{
+          title: "Dashboard",
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="grid-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      {/* Tambahkan screen lainnya */}
+    </Drawer>
+  );
+}
+```
 
 ---
 
-## Soal 8: Custom Drawer Content
+## Soal 8: Custom Drawer Content dengan Expo Router
 
 Buatlah aplikasi dengan custom drawer yang memiliki fitur tambahan:
 
@@ -256,69 +514,158 @@ Buatlah aplikasi dengan custom drawer yang memiliki fitur tambahan:
 5. Logout button dengan icon di footer
 6. App version di bawah logout
 
+**Struktur Folder:**
+
+```
+app/
+├── _layout.tsx
+├── components/
+│   └── CustomDrawerContent.tsx
+└── (drawer)/
+    ├── _layout.tsx
+    ├── index.tsx
+    ├── orders.tsx
+    ├── wishlist.tsx
+    ├── settings.tsx
+    └── help.tsx
+```
+
 **Spesifikasi:**
 
-- Gunakan `DrawerContentScrollView`
-- Implementasikan custom component untuk drawer
+- Buat component `CustomDrawerContent.tsx`
+- Gunakan `DrawerContentScrollView` dari `@react-navigation/drawer`
 - Tambahkan `DrawerItemList` untuk menu default
 - Custom styling untuk setiap section
 - Implementasikan switch untuk dark mode (UI only)
 - Animasi smooth saat drawer dibuka/ditutup
 
-**Struktur Drawer:**
+**Contoh CustomDrawerContent.tsx:**
 
+```typescript
+import {
+  DrawerContentScrollView,
+  DrawerItemList,
+} from "@react-navigation/drawer";
+import { View, Text, Image, StyleSheet, Switch } from "react-native";
+import { useState } from "react";
+
+export default function CustomDrawerContent(props: any) {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  return (
+    <DrawerContentScrollView {...props}>
+      {/* Profile Section */}
+      <View style={styles.profileSection}>
+        <Image
+          source={{ uri: "https://via.placeholder.com/80" }}
+          style={styles.avatar}
+        />
+        <Text style={styles.name}>John Doe</Text>
+        <Text style={styles.email}>john@example.com</Text>
+      </View>
+
+      {/* Drawer Items */}
+      <DrawerItemList {...props} />
+
+      {/* Theme Switcher */}
+      <View style={styles.themeSection}>
+        <Text>Dark Mode</Text>
+        <Switch value={isDarkMode} onValueChange={setIsDarkMode} />
+      </View>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Text>Version 1.0.0</Text>
+      </View>
+    </DrawerContentScrollView>
+  );
+}
 ```
-┌─────────────────────┐
-│  Profile Section    │
-│  Avatar + Name      │
-├─────────────────────┤
-│  Home              │
-│  My Orders         │
-│  Wishlist          │
-├─────────────────────┤
-│  Settings          │
-│  Help Center       │
-├─────────────────────┤
-│  Theme Switcher    │
-│  Logout Button     │
-│  Version 1.0.0     │
-└─────────────────────┘
+
+**Gunakan di \_layout.tsx:**
+
+```typescript
+import { Drawer } from "expo-router/drawer";
+import CustomDrawerContent from "../components/CustomDrawerContent";
+
+export default function Layout() {
+  return (
+    <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />}>
+      {/* Screens */}
+    </Drawer>
+  );
+}
 ```
 
 ---
 
-## Soal 9: Kombinasi Stack, Tab, dan Drawer
+## Soal 9: Kombinasi Stack, Tab, dan Drawer dengan Expo Router
 
 Buatlah aplikasi lengkap dengan kombinasi semua jenis navigator:
 
-**Struktur Navigasi:**
+**Struktur Folder:**
 
 ```
-Drawer Navigator
-├── Main App (Tab Navigator)
-│   ├── Home Tab (Stack)
-│   │   ├── HomeScreen
-│   │   └── NewsDetailScreen
-│   ├── Explore Tab (Stack)
-│   │   ├── ExploreScreen
-│   │   └── CategoryScreen
-│   └── Profile Tab (Stack)
-│       ├── ProfileScreen
-│       └── EditProfileScreen
-├── Settings (Single Screen)
-├── Notifications (Single Screen)
-└── About (Single Screen)
+app/
+├── _layout.tsx                    # Root layout
+└── (drawer)/
+    ├── _layout.tsx                # Drawer layout
+    ├── (tabs)/                    # Tab Navigator
+    │   ├── _layout.tsx            # Tab layout
+    │   ├── index.tsx              # Home tab root
+    │   ├── home/
+    │   │   └── [id].tsx           # News detail (stack)
+    │   ├── explore.tsx            # Explore tab root
+    │   ├── explore/
+    │   │   └── category.tsx       # Category (stack)
+    │   ├── profile.tsx            # Profile tab root
+    │   └── profile/
+    │       └── edit.tsx           # Edit profile (stack)
+    ├── settings.tsx               # Drawer item
+    ├── notifications.tsx          # Drawer item
+    └── about.tsx                  # Drawer item
 ```
 
 **Spesifikasi:**
 
-- Drawer sebagai root navigator
-- Tab navigator di dalam drawer untuk main app flow
-- Stack navigator di setiap tab untuk detail navigation
+- Drawer sebagai root navigator menggunakan folder `(drawer)`
+- Tab navigator di dalam drawer menggunakan folder `(tabs)`
+- Stack navigator di setiap tab menggunakan nested folders
 - Header dengan hamburger menu icon untuk buka drawer
-- Tab bar hanya muncul di main app, hilang di drawer screens
+- Tab bar hanya muncul di screens dalam `(tabs)`, hilang di drawer screens
 - Navigasi seamless antar semua navigator
 - Proper back handling di setiap level
+
+**Contoh membuka drawer dari header:**
+
+```typescript
+// Di (tabs)/_layout.tsx
+import { Tabs } from "expo-router";
+import { DrawerActions } from "@react-navigation/native";
+import { useNavigation } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+
+export default function TabLayout() {
+  const navigation = useNavigation();
+
+  return (
+    <Tabs
+      screenOptions={{
+        headerLeft: () => (
+          <Ionicons
+            name="menu"
+            size={24}
+            onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+            style={{ marginLeft: 15 }}
+          />
+        ),
+      }}
+    >
+      {/* Tabs */}
+    </Tabs>
+  );
+}
+```
 
 **Fitur tambahan:**
 
@@ -328,106 +675,139 @@ Drawer Navigator
 
 ---
 
-## Soal 10: Mini Project - Social Media App Navigation
+## Soal 10: Mini Project - Social Media App Navigation dengan Expo Router
 
 Buatlah struktur navigasi lengkap untuk aplikasi social media dengan fitur:
 
-**Screens yang harus dibuat:**
+**Struktur Folder:**
 
-1. **Auth Flow (Stack)**
-
-   - SplashScreen (headerShown: false)
-   - LoginScreen (headerShown: false)
-   - RegisterScreen (headerShown: false)
-
-2. **Main Flow (Drawer → Tab → Stack)**
-
-   - **Home Tab**: Feed → Post Detail → User Profile → Comments
-   - **Search Tab**: Search → Search Results → User Profile
-   - **Add Post Tab**: Create Post (Modal atau separate screen)
-   - **Notifications Tab**: Notification List → Notification Detail
-   - **Profile Tab**: My Profile → Edit Profile → Settings
-
-3. **Drawer Menu:**
-   - Saved Posts
-   - Archived
-   - Settings
-   - Help & Privacy
-   - Logout
+```
+app/
+├── _layout.tsx                           # Root layout
+├── index.tsx                             # Splash/Landing
+├── (auth)/                               # Auth group
+│   ├── _layout.tsx                       # Auth layout (no header)
+│   ├── login.tsx
+│   └── register.tsx
+└── (main)/                               # Main app group
+    └── (drawer)/                         # Drawer navigation
+        ├── _layout.tsx                   # Drawer config
+        ├── (tabs)/                       # Tab navigation
+        │   ├── _layout.tsx               # Tab config
+        │   ├── index.tsx                 # Home feed
+        │   ├── home/
+        │   │   ├── post/[id].tsx         # Post detail
+        │   │   ├── user/[id].tsx         # User profile
+        │   │   └── comments/[postId].tsx # Comments
+        │   ├── search.tsx                # Search
+        │   ├── search/
+        │   │   └── results.tsx           # Search results
+        │   ├── add.tsx                   # Create post (modal)
+        │   ├── notifications.tsx         # Notifications
+        │   ├── notifications/
+        │   │   └── [id].tsx              # Notification detail
+        │   ├── profile.tsx               # My profile
+        │   └── profile/
+        │       ├── edit.tsx              # Edit profile
+        │       └── settings.tsx          # Settings
+        ├── saved.tsx                     # Saved posts (drawer)
+        ├── archived.tsx                  # Archived (drawer)
+        └── help.tsx                      # Help & Privacy (drawer)
+```
 
 **Spesifikasi:**
 
-- Conditional navigation (show auth atau main based on login status)
-- Proper screen transitions dan animations
-- Header dengan actions (search icon, menu icon, create post icon)
-- Tab bar dengan 5 items dan custom styling
-- Badge pada notifications tab
-- Modal untuk create post atau confirmation dialogs
-- Deep linking capability structure
+1. **Auth Flow:**
+
+   - Gunakan folder group `(auth)` dengan `headerShown: false`
+   - Login dan Register screens
+   - Conditional rendering di root layout (auth vs main)
+
+2. **Main Flow:**
+
+   - Drawer → Tab → Stack navigation hierarchy
+   - Header dengan hamburger menu, search icon, create post icon
+   - Tab bar dengan 5 items (Home, Search, Add, Notifications, Profile)
+   - Badge pada notifications tab
+   - Modal presentation untuk create post
+
+3. **Features:**
+   - Dynamic routes untuk post detail, user profile, comments
+   - Deep linking support
+   - Proper back navigation handling
+   - Custom drawer content dengan profile header
+
+**Contoh Root Layout (\_layout.tsx):**
+
+```typescript
+import { Stack } from "expo-router";
+import { useState } from "react";
+
+export default function RootLayout() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // In real app, check auth status from AsyncStorage/Context
+
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      {!isAuthenticated ? (
+        <Stack.Screen name="(auth)" />
+      ) : (
+        <Stack.Screen name="(main)" />
+      )}
+    </Stack>
+  );
+}
+```
 
 **Challenge:**
 
-- Implementasikan navigation ref untuk navigate dari luar component
-- Implementasikan screen tracking untuk analytics
-- Handle Android back button properly
-- Persist navigation state
+- Implementasikan Context API untuk auth state management
+- Implementasikan screen tracking dengan `useSegments()`
+- Handle Android back button dengan `useFocusEffect`
+- Persist auth state dengan AsyncStorage
+- Implementasikan modal presentation untuk create post dengan `presentation: "modal"`
 
-**File Structure:**
+**Tips:**
 
-```
-src/
-├── navigation/
-│   ├── AppNavigator.js
-│   ├── AuthNavigator.js
-│   ├── MainNavigator.js
-│   ├── DrawerNavigator.js
-│   ├── TabNavigator.js
-│   └── StackNavigators/
-│       ├── HomeStack.js
-│       ├── SearchStack.js
-│       ├── NotificationStack.js
-│       └── ProfileStack.js
-├── screens/
-│   ├── Auth/
-│   ├── Home/
-│   ├── Search/
-│   ├── Notifications/
-│   └── Profile/
-└── components/
-    └── CustomDrawerContent.js
-```
+- Gunakan folder groups dengan `()` untuk grouping tanpa path segment
+- Gunakan `href={null}` untuk hide tab tertentu dari tab bar
+- Gunakan `useLocalSearchParams()` untuk dynamic routes
+- Gunakan `useRouter()` untuk programmatic navigation
 
 ---
 
 ## Tips Pengerjaan
 
-1. **Setup Project**: Gunakan Expo untuk kemudahan development
+1. **Setup Project**: Gunakan `npx create-expo-app --template tabs` untuk quick start
 2. **Install Dependencies**: Install semua library yang dibutuhkan sebelum mulai coding
-3. **Structure First**: Rencanakan struktur navigasi sebelum coding
-4. **Test Incrementally**: Test setiap navigator sebelum menggabungkan
-5. **Console Log**: Gunakan console.log untuk debug navigation flow
-6. **Navigation DevTools**: Gunakan React Navigation DevTools untuk debugging
-7. **Clean Code**: Pisahkan navigator ke file terpisah untuk maintainability
-8. **Type Safety**: Pertimbangkan gunakan TypeScript untuk type-safe navigation
-9. **Performance**: Lazy load screens yang jarang diakses
+3. **Structure First**: Rencanakan struktur folder `app/` sebelum coding
+4. **Test Incrementally**: Test setiap route sebelum membuat nested navigation
+5. **Console Log**: Gunakan console.log untuk debug navigation flow dan params
+6. **File-based Routing**: Pahami mapping folder structure ke URL routes
+7. **Clean Code**: Gunakan TypeScript untuk type-safe navigation
+8. **Type Safety**: Gunakan typed routes dengan `expo-router` TypeScript support
+9. **Performance**: Lazy load dengan dynamic imports untuk screens berat
 10. **User Experience**: Perhatikan animasi dan transition yang smooth
 
 ---
 
 ## Kriteria Penilaian
 
-- **Fungsionalitas (40%)**: Navigasi bekerja dengan benar, no crashes
-- **Struktur Navigasi (25%)**: Proper nesting dan organization
+- **Fungsionalitas (40%)**: Navigasi bekerja dengan benar, no crashes, params passing correct
+- **Struktur Folder (25%)**: Proper folder structure, file naming, dan organization
 - **UI/UX (20%)**: Tampilan menarik, animasi smooth, intuitive navigation
-- **Code Quality (15%)**: Clean code, proper file structure, reusable components
+- **Code Quality (15%)**: Clean code, TypeScript usage, reusable components
 
 ---
 
 ## Resources
 
-- [React Navigation Documentation](https://reactnavigation.org/docs/getting-started)
+- [Expo Router Documentation](https://docs.expo.dev/router/introduction/)
+- [Expo Router API Reference](https://docs.expo.dev/router/reference/api/)
 - [Expo Vector Icons](https://icons.expo.fyi/)
-- [React Navigation Examples](https://github.com/react-navigation/react-navigation/tree/main/example)
+- [Expo Router Examples](https://github.com/expo/router/tree/main/apps)
+- [File-based Routing Guide](https://docs.expo.dev/router/create-pages/)
 
 ---
 
