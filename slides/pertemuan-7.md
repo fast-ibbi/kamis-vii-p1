@@ -31,6 +31,8 @@ Setelah mengikuti pertemuan ini, mahasiswa diharapkan mampu:
 
 **Props (Properties)** adalah mekanisme untuk mengirim data dari komponen parent ke komponen child. Props memungkinkan komponen menjadi reusable dengan menerima data yang berbeda-beda.
 
+---
+
 ```javascript
 // Komponen Parent
 import React from "react";
@@ -57,6 +59,8 @@ Props memiliki karakteristik khusus:
 - **Immutable:** Nilainya tetap selama lifecycle
 - **Unidirectional:** Mengalir dari parent ke child (top-down)
 
+---
+
 ```javascript
 // SALAH - Tidak boleh mengubah props
 const Greeting = (props) => {
@@ -77,25 +81,17 @@ const Greeting = (props) => {
 Mengirim berbagai tipe data melalui props:
 
 ```javascript
-// Greeting.js
 import React from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { Text } from 'react-native';
 
 const Greeting = (props) => {
   return (
-    <Text style={styles.text}>
+    <Text>
       Hello {props.name}, umur {props.age} tahun
     </Text>
   );
 };
 
-const styles = StyleSheet.create({
-  text: { fontSize: 18, marginVertical: 5 }
-});
-
-export default Greeting;
-
-// App.js
 <Greeting name="Budi" age={20} />
 <Greeting name="Ani" age={19} />
 ```
@@ -118,7 +114,11 @@ const CustomButton = (props) => {
     </TouchableOpacity>
   );
 };
+```
 
+---
+
+```javascript
 // App.js
 const App = () => {
   const handlePress = () => {
@@ -144,7 +144,11 @@ const Greeting = (props) => {
     </Text>
   );
 };
+```
 
+---
+
+```javascript
 // Dengan destructuring (Recommended)
 const Greeting = ({ name, age }) => {
   return (
@@ -153,7 +157,11 @@ const Greeting = ({ name, age }) => {
     </Text>
   );
 };
+```
 
+---
+
+```javascript
 // Destructuring dengan default value
 const Greeting = ({ name = "Guest", age = 0 }) => {
   return (
@@ -181,13 +189,21 @@ const Greeting = ({ name, age }) => {
     </Text>
   );
 };
+```
 
+---
+
+```javascript
 // Cara 1: Inline default value
 Greeting.defaultProps = {
   name: "Guest",
   age: 0,
 };
+```
 
+---
+
+```javascript
 // Cara 2: Destructuring dengan default
 const Greeting2 = ({ name = "Guest", age = 0 }) => {
   return (
@@ -218,7 +234,11 @@ const UserCard = ({ name, age, isActive }) => {
     </Text>
   );
 };
+```
 
+---
+
+```javascript
 UserCard.propTypes = {
   name: PropTypes.string.isRequired,
   age: PropTypes.number.isRequired,
@@ -244,6 +264,8 @@ State digunakan untuk:
 - Data hasil fetching API
 - Toggle visibility komponen
 - Form input values
+
+---
 
 ```javascript
 import React, { useState } from "react";
@@ -273,6 +295,8 @@ const Counter = () => {
 | Perubahan  | Tidak bisa diubah komponen | Bisa diubah dengan setState |
 | Re-render  | Parent re-render           | Komponen re-render          |
 
+---
+
 ```javascript
 // Props: dari parent
 <UserCard name="Budi" age={20} />;
@@ -293,44 +317,13 @@ Gunakan state ketika:
 - Form handling
 - Loading indicators
 
+---
+
 Jangan gunakan state untuk:
 
 - Data yang tidak berubah (gunakan const)
 - Data dari parent (gunakan props)
 - Computed values (gunakan variables biasa)
-
----
-
-## Class Component State (Intro)
-
-Sebelum Hooks, state dikelola di Class Component (untuk konteks historis):
-
-```javascript
-import React, { Component } from "react";
-import { View, Text, Button } from "react-native";
-
-class Counter extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      count: 0,
-    };
-  }
-
-  increment = () => {
-    this.setState({ count: this.state.count + 1 });
-  };
-
-  render() {
-    return (
-      <View>
-        <Text>Count: {this.state.count}</Text>
-        <Button title="Tambah" onPress={this.increment} />
-      </View>
-    );
-  }
-}
-```
 
 ---
 
@@ -388,16 +381,16 @@ Counter sederhana dengan increment dan decrement:
 
 ```javascript
 import React, { useState } from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
+import { View, Text, Button } from "react-native";
 
 const Counter = () => {
   const [count, setCount] = useState(0);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.countText}>Count: {count}</Text>
+    <View>
+      <Text>Count: {count}</Text>
 
-      <View style={styles.buttonContainer}>
+      <View>
         <Button title="Kurang" onPress={() => setCount(count - 1)} />
         <Button title="Tambah" onPress={() => setCount(count + 1)} />
         <Button title="Reset" onPress={() => setCount(0)} />
@@ -405,12 +398,6 @@ const Counter = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { padding: 20 },
-  countText: { fontSize: 24, textAlign: "center", marginBottom: 20 },
-  buttonContainer: { flexDirection: "row", justifyContent: "space-around" },
-});
 
 export default Counter;
 ```
@@ -432,17 +419,25 @@ const Example = () => {
   const wrongWay = () => {
     count = count + 1; // ERROR! Tidak akan trigger re-render
   };
+```
 
-  // BENAR - Gunakan setState
-  const correctWay = () => {
-    setCount(count + 1);
-  };
+---
 
-  // BENAR - Dengan callback (untuk nilai berdasarkan state sebelumnya)
-  const betterWay = () => {
-    setCount((prevCount) => prevCount + 1);
-  };
+```javascript
+// BENAR - Gunakan setState
+const correctWay = () => {
+  setCount(count + 1);
+};
 
+// BENAR - Dengan callback (untuk nilai berdasarkan state sebelumnya)
+const betterWay = () => {
+  setCount((prevCount) => prevCount + 1);
+};
+```
+
+---
+
+```javascript
   // BENAR - Multiple updates
   const multipleUpdates = () => {
     setCount((prev) => prev + 1);
@@ -471,49 +466,9 @@ const UserForm = () => {
   const [age, setAge] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = () => {
-    setSubmitted(true);
-  };
-
-  return (
-    <View style={styles.container}>
-      <TextInput
-        placeholder="Nama"
-        value={name}
-        onChangeText={setName}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Umur"
-        value={age}
-        onChangeText={setAge}
-        keyboardType="numeric"
-        style={styles.input}
-      />
-      <Button title="Submit" onPress={handleSubmit} />
-
-      {submitted && (
-        <Text style={styles.result}>
-          {name} - {email} - {age} tahun
-        </Text>
-      )}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { padding: 20 },
-  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 5 },
-  result: { marginTop: 20, fontSize: 16, color: "green" },
-});
-
-export default UserForm;
 ```
 
 ---
@@ -541,48 +496,7 @@ const UserProfile = () => {
   const updateEmail = (value) => {
     setUser({ ...user, email: value });
   };
-
-  // Atau buat fungsi generic
-  const handleChange = (field, value) => {
-    setUser((prevUser) => ({
-      ...prevUser,
-      [field]: value,
-    }));
-  };
-
-  return (
-    <View style={styles.container}>
-      <TextInput
-        placeholder="Nama"
-        value={user.name}
-        onChangeText={(value) => handleChange("name", value)}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Email"
-        value={user.email}
-        onChangeText={(value) => handleChange("email", value)}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Phone"
-        value={user.phone}
-        onChangeText={(value) => handleChange("phone", value)}
-        style={styles.input}
-      />
-
-      <Text style={styles.preview}>{JSON.stringify(user, null, 2)}</Text>
-    </View>
-  );
 };
-
-const styles = StyleSheet.create({
-  container: { padding: 20 },
-  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 5 },
-  preview: { marginTop: 20, padding: 10, backgroundColor: "#f0f0f0" },
-});
-
-export default UserProfile;
 ```
 
 ---
@@ -605,244 +519,28 @@ import {
 const TodoList = () => {
   const [todos, setTodos] = useState([]);
   const [inputText, setInputText] = useState("");
-
-  // Menambah item
-  const addTodo = () => {
-    if (inputText.trim()) {
-      setTodos([...todos, { id: Date.now(), text: inputText }]);
-      setInputText("");
-    }
-  };
-
-  // Menghapus item
-  const deleteTodo = (id) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
-  };
-
-  // Clear all
-  const clearAll = () => {
-    setTodos([]);
-  };
-
-  return (
-    <View style={styles.container}>
-      <TextInput
-        placeholder="Tambah todo..."
-        value={inputText}
-        onChangeText={setInputText}
-        style={styles.input}
-      />
-      <View style={styles.buttonRow}>
-        <Button title="Tambah" onPress={addTodo} />
-        <Button title="Clear All" onPress={clearAll} color="red" />
-      </View>
-
-      <FlatList
-        data={todos}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.todoItem}>
-            <Text style={styles.todoText}>{item.text}</Text>
-            <Button
-              title="Hapus"
-              onPress={() => deleteTodo(item.id)}
-              color="red"
-            />
-          </View>
-        )}
-      />
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: { padding: 20, flex: 1 },
-  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 5 },
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  todoItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 10,
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
-  },
-  todoText: { fontSize: 16 },
-});
-
-export default TodoList;
 ```
 
 ---
 
-## Lifting State Up
-
-**Lifting State Up** adalah teknik memindahkan state ke parent component agar bisa di-share ke multiple child components.
-
 ```javascript
-import React, { useState } from "react";
-import { View, TextInput, Text, StyleSheet } from "react-native";
-
-// Child Component 1
-const TemperatureInput = ({ scale, temperature, onTemperatureChange }) => {
-  return (
-    <View style={styles.inputContainer}>
-      <Text>Masukkan suhu dalam {scale}:</Text>
-      <TextInput
-        value={temperature}
-        onChangeText={onTemperatureChange}
-        keyboardType="numeric"
-        style={styles.input}
-      />
-    </View>
-  );
+// Menambah item
+const addTodo = () => {
+  if (inputText.trim()) {
+    setTodos([...todos, { id: Date.now(), text: inputText }]);
+    setInputText("");
+  }
 };
 
-// Child Component 2
-const BoilingVerdict = ({ celsius }) => {
-  return (
-    <Text style={styles.verdict}>
-      {celsius >= 100 ? "Air akan mendidih!" : "Air tidak akan mendidih."}
-    </Text>
-  );
+// Menghapus item
+const deleteTodo = (id) => {
+  setTodos(todos.filter((todo) => todo.id !== id));
 };
 
-// Parent Component - State di-lift ke sini
-const Calculator = () => {
-  const [temperature, setTemperature] = useState("");
-
-  return (
-    <View style={styles.container}>
-      <TemperatureInput
-        scale="Celsius"
-        temperature={temperature}
-        onTemperatureChange={setTemperature}
-      />
-      <BoilingVerdict celsius={parseFloat(temperature)} />
-    </View>
-  );
+// Clear all
+const clearAll = () => {
+  setTodos([]);
 };
-
-const styles = StyleSheet.create({
-  container: { padding: 20 },
-  inputContainer: { marginBottom: 20 },
-  input: { borderWidth: 1, padding: 10, marginTop: 5, borderRadius: 5 },
-  verdict: { fontSize: 18, fontWeight: "bold", color: "red" },
-});
-
-export default Calculator;
-```
-
----
-
-## Contoh Lifting State Up
-
-Form dengan state di parent yang dibagikan ke multiple children:
-
-```javascript
-import React, { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
-
-// Child: Input Component
-const FormInput = ({ label, value, onChange }) => {
-  return (
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>{label}</Text>
-      <TextInput value={value} onChangeText={onChange} style={styles.input} />
-    </View>
-  );
-};
-
-// Child: Display Component
-const FormPreview = ({ name, email }) => {
-  return (
-    <View style={styles.preview}>
-      <Text style={styles.previewTitle}>Preview:</Text>
-      <Text>Nama: {name || "-"}</Text>
-      <Text>Email: {email || "-"}</Text>
-    </View>
-  );
-};
-
-// Parent: State dikelola di sini
-const RegistrationForm = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-
-  return (
-    <View style={styles.container}>
-      <FormInput label="Nama" value={name} onChange={setName} />
-      <FormInput label="Email" value={email} onChange={setEmail} />
-      <FormPreview name={name} email={email} />
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: { padding: 20 },
-  inputGroup: { marginBottom: 15 },
-  label: { fontSize: 16, marginBottom: 5 },
-  input: { borderWidth: 1, padding: 10, borderRadius: 5 },
-  preview: {
-    marginTop: 20,
-    padding: 15,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 5,
-  },
-  previewTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
-});
-
-export default RegistrationForm;
-```
-
----
-
-## Controlled Components
-
-**Controlled Component** adalah input yang nilainya dikontrol oleh state React.
-
-```javascript
-import React, { useState } from "react";
-import { View, TextInput, Text, StyleSheet } from "react-native";
-
-const ControlledInput = () => {
-  const [text, setText] = useState("");
-
-  // Uncontrolled - TIDAK DIREKOMENDASIKAN untuk React Native
-  // <TextInput />
-  // Nilai tidak dikontrol React
-
-  // Controlled - DIREKOMENDASIKAN
-  // <TextInput value={text} onChangeText={setText} />
-  // Nilai selalu sync dengan state
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Controlled Input:</Text>
-      <TextInput
-        value={text}
-        onChangeText={setText}
-        placeholder="Ketik sesuatu..."
-        style={styles.input}
-      />
-      <Text style={styles.output}>Anda mengetik: {text}</Text>
-      <Text style={styles.output}>Panjang karakter: {text.length}</Text>
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: { padding: 20 },
-  label: { fontSize: 16, marginBottom: 5 },
-  input: { borderWidth: 1, padding: 10, borderRadius: 5, marginBottom: 10 },
-  output: { fontSize: 14, color: "#666", marginTop: 5 },
-});
-
-export default ControlledInput;
 ```
 
 ---
@@ -1142,15 +840,9 @@ const [lastName, setLastName] = useState("");
 const fullName = `${firstName} ${lastName}`;
 ```
 
-5. **Lift state up hanya jika diperlukan**
-
-```javascript
-// Taruh state sedekat mungkin dengan komponen yang menggunakannya
-```
-
 ---
 
-## Quiz Pilihan Berganda
+## Quiz
 
 ---
 
@@ -1163,7 +855,7 @@ B. Read-only dan immutable
 C. Hanya bisa mengirim string
 D. Tidak bisa dikirim ke child component
 
-**Jawaban: B**
+<!-- **Jawaban: B** -->
 
 ---
 
@@ -1176,20 +868,20 @@ B. `count = 5`
 C. `setCount(5)`
 D. `updateCount(5)`
 
-**Jawaban: C**
+<!-- **Jawaban: C** -->
 
 ---
 
 ## Soal 3
 
-Apa yang dimaksud dengan "Lifting State Up"?
+Apa yang akan terjadi jika kita mencoba mengubah props secara langsung di dalam komponen child?
 
-A. Memindahkan state ke komponen paling atas (App.js)
-B. Memindahkan state ke parent component agar bisa di-share ke multiple children
-C. Menghapus state dari aplikasi
-D. Memindahkan state ke Redux store
+A. Props akan berubah dan komponen akan re-render
+B. Akan terjadi error karena props bersifat read-only
+C. Props akan berubah hanya di komponen child saja
+D. Tidak ada yang terjadi, perubahan diabaikan
 
-**Jawaban: B**
+<!-- **Jawaban: B** -->
 
 ---
 
@@ -1202,7 +894,7 @@ B. `setCount((prev) => prev + 1)`
 C. `count = count + 1`
 D. `updateState(count + 1)`
 
-**Jawaban: B**
+<!-- **Jawaban: B** -->
 
 ---
 
@@ -1215,7 +907,7 @@ B. Input yang nilainya dikontrol oleh state React
 C. Component yang memiliki validasi
 D. Component yang tidak bisa diubah
 
-**Jawaban: B**
+<!-- **Jawaban: B** -->
 
 ---
 
@@ -1228,7 +920,7 @@ B. `setUser({ name: "John" })`
 C. `setUser({ ...user, name: "John" })`
 D. `user.name = "John"`
 
-**Jawaban: C**
+<!-- **Jawaban: C** -->
 
 ---
 
@@ -1241,7 +933,7 @@ B. Untuk data yang tidak pernah berubah
 C. Untuk data yang berubah karena interaksi user
 D. Hanya untuk data dari API
 
-**Jawaban: C**
+<!-- **Jawaban: C** -->
 
 ---
 
@@ -1254,7 +946,7 @@ B. Validasi tipe data props
 C. Membuat props menjadi required
 D. Menghapus props yang tidak diperlukan
 
-**Jawaban: B**
+<!-- **Jawaban: B** -->
 
 ---
 
@@ -1267,7 +959,7 @@ B. Props dari parent, State internal komponen
 C. State tidak bisa diubah, Props bisa diubah
 D. Props dan State adalah hal yang sama
 
-**Jawaban: B**
+<!-- **Jawaban: B** -->
 
 ---
 
@@ -1280,8 +972,4 @@ B. `items.push(newItem)`
 C. `setItems([...items, newItem])`
 D. `setItems(items + newItem)`
 
-**Jawaban: C**
-
----
-
-**Selamat! Anda telah menyelesaikan materi State dan Props dalam React Native** 🎉
+<!-- **Jawaban: C** -->
