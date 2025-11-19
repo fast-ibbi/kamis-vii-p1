@@ -820,6 +820,8 @@ setCount(count + 1);
 setCount((prev) => prev + 1);
 ```
 
+---
+
 3. **Spread operator untuk update object/array**
 
 ```javascript
