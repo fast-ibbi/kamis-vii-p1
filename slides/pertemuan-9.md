@@ -22,12 +22,6 @@ Mahasiswa mampu menangani interaksi pengguna, mengelola input, dan menerapkan va
 
 ---
 
-## Outline Materi
-
-Event handling, input components, state management untuk form, validasi input, best practices.
-
----
-
 ## Pengertian Event Handling
 
 Event handling adalah proses menangkap dan merespons aksi pengguna seperti klik, sentuh, ketik, dan gesture lainnya dalam aplikasi mobile. Event handler memungkinkan aplikasi menjadi interaktif dan responsif terhadap input pengguna.
@@ -114,6 +108,8 @@ TextInput memiliki banyak props untuk kustomisasi:
 - **keyboardType**: Jenis keyboard
 - **multiline**: Input multi-baris
 - **maxLength**: Batas panjang karakter
+
+---
 
 ```javascript
 <TextInput
@@ -268,6 +264,8 @@ Form validation adalah proses memverifikasi bahwa input pengguna memenuhi kriter
 - **Server-side validation**: Validasi di backend (wajib untuk keamanan)
 - **Real-time validation**: Validasi saat user mengetik
 - **On-submit validation**: Validasi saat form disubmit
+
+---
 
 ```javascript
 // Real-time validation
@@ -581,6 +579,8 @@ Praktik terbaik untuk user experience form:
 - Disable state yang jelas
 - Auto-focus pada field pertama
 
+---
+
 ```javascript
 <View>
   <Text style={styles.label}>Email *</Text>
@@ -647,7 +647,7 @@ B. onChange
 C. onChangeText
 D. onTextChange
 
-**Jawaban: C**
+<!-- **Jawaban: C** -->
 
 ---
 
@@ -660,7 +660,7 @@ B. Komponen input yang nilainya dikendalikan oleh state React
 C. Komponen yang memiliki validasi
 D. Komponen yang menggunakan ref
 
-**Jawaban: B**
+<!-- **Jawaban: B** -->
 
 ---
 
@@ -673,7 +673,7 @@ B. passwordMode
 C. secureTextEntry
 D. hidePassword
 
-**Jawaban: C**
+<!-- **Jawaban: C** -->
 
 ---
 
@@ -686,7 +686,7 @@ B. `setForm({ email: "new@email.com" })`
 C. `setForm({ ...form, email: "new@email.com" })`
 D. `form = { email: "new@email.com" }`
 
-**Jawaban: C**
+<!-- **Jawaban: C** -->
 
 ---
 
@@ -699,7 +699,7 @@ B. Server-side validation
 C. Real-time validation
 D. Post validation
 
-**Jawaban: C**
+<!-- **Jawaban: C** -->
 
 ---
 
@@ -712,7 +712,7 @@ B. `/^[^\s@]+@[^\s@]+\.[^\s@]+$/`
 C. `/email@domain.com/`
 D. `/^@.+$/`
 
-**Jawaban: B**
+<!-- **Jawaban: B** -->
 
 ---
 
@@ -725,7 +725,7 @@ B. "number-pad"
 C. "phone-pad"
 D. "telephone"
 
-**Jawaban: C**
+<!-- **Jawaban: C** -->
 
 ---
 
@@ -738,7 +738,7 @@ B. Ketika ada error atau field wajib kosong
 C. Hanya ketika loading
 D. Tidak perlu disabled
 
-**Jawaban: B**
+<!-- **Jawaban: B** -->
 
 ---
 
@@ -751,7 +751,7 @@ B. Yup
 C. React Hook Form
 D. Redux Form
 
-**Jawaban: B**
+<!-- **Jawaban: B** -->
 
 ---
 
@@ -764,7 +764,7 @@ B. Mengatur lebar maksimal input
 C. Membatasi jumlah karakter yang bisa diinput
 D. Mengatur ukuran font maksimal
 
-**Jawaban: C**
+<!-- **Jawaban: C** -->
 
 ---
 
