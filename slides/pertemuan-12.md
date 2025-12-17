@@ -1,7 +1,7 @@
 ---
-title: Database Lokal (AsyncStorage / SQLite)
+title: State Management dengan Redux/Context API
 version: 1.0.0
-header: Database Lokal (AsyncStorage / SQLite)
+header: State Management dengan Redux/Context API
 footer: https://github.com/fast-ibbi/kamis-vii-p1
 paginate: true
 marp: true
@@ -12,1040 +12,824 @@ _class: lead
 _paginate: skip
 -->
 
-# **Database Lokal (AsyncStorage / SQLite)**
+# **State Management dengan Redux/Context API**
 
 ---
 
-### Slide 1: Judul - Database Lokal dalam React Native
+### Pengenalan State Management
 
-Pertemuan ini membahas teknik penyimpanan data lokal di perangkat mobile menggunakan React Native. Mahasiswa akan mempelajari dua pendekatan utama: AsyncStorage untuk data sederhana dan SQLite untuk data kompleks dengan relasi.
+**1. Apa itu State Management?**
 
----
-
-### Slide 2: Mengapa Perlu Penyimpanan Lokal?
-
-Penyimpanan lokal memungkinkan aplikasi menyimpan data di perangkat pengguna tanpa koneksi internet. Keuntungannya meliputi:
-
-- Akses data lebih cepat (tidak perlu request ke server)
-- Aplikasi tetap berfungsi offline
-- Mengurangi beban server dan biaya bandwidth
-- Menyimpan preferensi pengguna dan cache data
-
-Contoh use case: menyimpan token autentikasi, pengaturan aplikasi, data favorit, atau history pencarian.
-
----
-
-### Slide 3: Perbandingan Penyimpanan Lokal vs Cloud
-
-**Penyimpanan Lokal:**
-
-- Data tersimpan di perangkat
-- Akses cepat tanpa internet
-- Kapasitas terbatas
-- Data hilang jika aplikasi dihapus
-
-**Penyimpanan Cloud:**
-
-- Data tersimpan di server
-- Memerlukan koneksi internet
-- Kapasitas lebih besar
-- Data persisten lintas perangkat
-
-Solusi terbaik: kombinasi keduanya (local storage untuk cache, cloud untuk data utama).
-
----
-
-### Slide 4: Jenis-jenis Storage di React Native
-
-React Native menyediakan beberapa opsi penyimpanan:
-
-**AsyncStorage:** Key-value storage sederhana untuk data kecil
-**SQLite:** Database relasional untuk data terstruktur kompleks
-**Realm:** Database object-oriented alternatif
-**MMKV:** Storage super cepat untuk key-value
-**File System:** Menyimpan file langsung (gambar, dokumen)
-
-Pemilihan bergantung pada kompleksitas dan volume data aplikasi.
-
----
-
-### Slide 5: AsyncStorage vs SQLite: Kapan Menggunakan?
-
-**Gunakan AsyncStorage untuk:**
-
-- Data sederhana (string, number, boolean)
-- Pengaturan aplikasi
-- Token autentikasi
-- Data yang tidak saling berhubungan
-- Jumlah data < 6MB
-
-**Gunakan SQLite untuk:**
-
-- Data terstruktur dengan relasi
-- Query kompleks (JOIN, filtering)
-- Volume data besar
-- Memerlukan indexing
-- Transaksi data yang kompleks
-
----
-
-### Slide 6: Apa itu AsyncStorage?
-
-AsyncStorage adalah sistem penyimpanan key-value asinkron yang sederhana dan tidak terenkripsi. Data disimpan dalam format string, sehingga objek harus dikonversi terlebih dahulu.
-
-Karakteristik utama:
-
-- Berbasis Promise (async/await)
-- Global untuk seluruh aplikasi
-- Persistent (data tetap ada setelah aplikasi ditutup)
-- Tidak terenkripsi (jangan simpan data sensitif)
-
----
-
-### Slide 7: Karakteristik AsyncStorage (Key-Value Storage)
-
-AsyncStorage bekerja seperti dictionary/map dengan pasangan key-value:
+State management adalah cara mengatur dan mengelola data (state) dalam aplikasi. State management membantu kita menyimpan, mengubah, dan membagikan data antar komponen secara terorganisir.
 
 ```javascript
-// Konsep key-value
-key: "username" → value: "johndoe"
-key: "theme" → value: "dark"
-key: "isLoggedIn" → value: "true"
+// Contoh state sederhana
+const [count, setCount] = useState(0);
+const [user, setUser] = useState({ name: "", email: "" });
 ```
 
-Setiap data diidentifikasi dengan key unik bertipe string. Value juga harus string, sehingga tipe data lain perlu dikonversi.
+**2. Mengapa Perlu State Management Global?**
 
----
-
-### Slide 8: Instalasi @react-native-async-storage/async-storage
-
-Instalasi menggunakan npm atau yarn:
-
-```bash
-npm install @react-native-async-storage/async-storage
-```
-
-Untuk Expo:
-
-```bash
-npx expo install @react-native-async-storage/async-storage
-```
-
-Import dalam komponen:
+Aplikasi kompleks memiliki banyak komponen yang perlu berbagi data. Tanpa state management global, kita harus passing props berkali-kali (props drilling) yang membuat kode sulit dipelihara.
 
 ```javascript
-import AsyncStorage from "@react-native-async-storage/async-storage";
+// Tanpa state management - props drilling
+<App>
+  <Header user={user} />
+  <Main user={user}>
+    <Profile user={user}>
+      <UserInfo user={user} />
+    </Profile>
+  </Main>
+</App>
 ```
 
-Tidak perlu konfigurasi tambahan, langsung siap digunakan.
+**3. Masalah Props Drilling**
 
----
-
-### Slide 9: Metode Dasar AsyncStorage
-
-AsyncStorage memiliki beberapa metode utama:
+Props drilling terjadi ketika kita harus melewatkan props melalui banyak komponen perantara yang tidak menggunakan props tersebut.
 
 ```javascript
-// Menyimpan data
-await AsyncStorage.setItem(key, value);
+// Props drilling - tidak efisien
+function App() {
+  const [user, setUser] = useState({ name: "John" });
+  return <Parent user={user} />;
+}
 
-// Mengambil data
-const value = await AsyncStorage.getItem(key);
+function Parent({ user }) {
+  return <Child user={user} />; // hanya meneruskan
+}
 
-// Menghapus satu item
-await AsyncStorage.removeItem(key);
+function Child({ user }) {
+  return <GrandChild user={user} />; // hanya meneruskan
+}
 
-// Menghapus semua data
-await AsyncStorage.clear();
-
-// Mengambil semua keys
-const keys = await AsyncStorage.getAllKeys();
-
-// Operasi multiple
-await AsyncStorage.multiSet([
-  [key1, value1],
-  [key2, value2],
-]);
+function GrandChild({ user }) {
+  return <Text>{user.name}</Text>; // akhirnya digunakan
+}
 ```
 
-Semua metode bersifat asinkron dan mengembalikan Promise.
+**4. Perbandingan Local State vs Global State**
 
----
-
-### Slide 10: Menyimpan Data Sederhana dengan setItem
-
-Metode setItem menyimpan data dengan key tertentu:
+Local state hanya tersedia dalam satu komponen, sementara global state dapat diakses dari mana saja dalam aplikasi.
 
 ```javascript
-import AsyncStorage from "@react-native-async-storage/async-storage";
+// Local State
+function Counter() {
+  const [count, setCount] = useState(0); // hanya di komponen ini
+  return <Text>{count}</Text>;
+}
 
-// Fungsi menyimpan data
-const saveUserData = async () => {
-  try {
-    await AsyncStorage.setItem("username", "johndoe");
-    await AsyncStorage.setItem("email", "john@example.com");
-    console.log("Data berhasil disimpan");
-  } catch (error) {
-    console.error("Error menyimpan data:", error);
-  }
-};
-
-// Penggunaan dalam komponen
-const handleSave = () => {
-  saveUserData();
-};
+// Global State (konsep)
+// Bisa diakses dari komponen manapun tanpa props
+const globalUser = useGlobalState("user");
 ```
 
-Selalu gunakan try-catch untuk menangani error.
+**5. Kapan Menggunakan State Management**
 
----
+Gunakan state management global ketika:
 
-### Slide 11: Mengambil Data dengan getItem
-
-Metode getItem mengambil data berdasarkan key:
+- Data perlu diakses banyak komponen
+- Data berubah dari berbagai tempat
+- Aplikasi memiliki hierarki komponen yang dalam
 
 ```javascript
-const getUserData = async () => {
-  try {
-    const username = await AsyncStorage.getItem("username");
-    const email = await AsyncStorage.getItem("email");
-
-    if (username !== null && email !== null) {
-      console.log("Username:", username);
-      console.log("Email:", email);
-      return { username, email };
-    } else {
-      console.log("Data tidak ditemukan");
-      return null;
-    }
-  } catch (error) {
-    console.error("Error mengambil data:", error);
-  }
-};
-
-// Dalam komponen
-const [userData, setUserData] = useState(null);
-
-useEffect(() => {
-  const loadData = async () => {
-    const data = await getUserData();
-    setUserData(data);
-  };
-  loadData();
-}, []);
+// Scenario memerlukan global state:
+// - Informasi user login
+// - Shopping cart
+// - Theme aplikasi
+// - Notification system
 ```
-
-Periksa null untuk memastikan data ada.
 
 ---
 
-### Slide 12: Menghapus Data dengan removeItem dan clear
+### Context API
 
-Menghapus data spesifik atau seluruh data:
+**6. Pengenalan Context API**
+
+Context API adalah fitur bawaan React untuk membuat global state tanpa library eksternal. Context memungkinkan data mengalir ke komponen tanpa props drilling.
 
 ```javascript
-// Menghapus satu item
-const removeUser = async () => {
-  try {
-    await AsyncStorage.removeItem("username");
-    console.log("Username dihapus");
-  } catch (error) {
-    console.error("Error menghapus:", error);
-  }
-};
+import { createContext } from "react";
 
-// Menghapus beberapa item
-const removeMultiple = async () => {
-  try {
-    const keys = ["username", "email", "token"];
-    await AsyncStorage.multiRemove(keys);
-    console.log("Data dihapus");
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
-
-// Menghapus semua data (hati-hati!)
-const clearAll = async () => {
-  try {
-    await AsyncStorage.clear();
-    console.log("Semua data dihapus");
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
+// Membuat context untuk tema aplikasi
+const ThemeContext = createContext("light");
 ```
 
----
+**7. Konsep Provider dan Consumer**
 
-### Slide 13: Menyimpan Objek dan Array (JSON.stringify)
-
-AsyncStorage hanya menerima string, gunakan JSON.stringify untuk objek:
+Provider menyediakan data, Consumer mengonsumsi data. Provider membungkus komponen yang perlu akses ke context.
 
 ```javascript
-const saveUserProfile = async () => {
-  try {
-    const userProfile = {
-      id: 1,
-      name: "John Doe",
-      age: 25,
-      hobbies: ["reading", "coding", "gaming"],
-    };
+// Provider menyediakan nilai
+<ThemeContext.Provider value="dark">
+  <App />
+</ThemeContext.Provider>
 
-    // Konversi objek ke string JSON
-    const jsonValue = JSON.stringify(userProfile);
-    await AsyncStorage.setItem("userProfile", jsonValue);
-    console.log("Profile disimpan");
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
-
-// Menyimpan array
-const saveFavorites = async (favorites) => {
-  try {
-    const jsonArray = JSON.stringify(favorites);
-    await AsyncStorage.setItem("favorites", jsonArray);
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
+// Consumer mengambil nilai
+<ThemeContext.Consumer>
+  {theme => <Text>{theme}</Text>}
+</ThemeContext.Consumer>
 ```
 
----
+**8. Membuat Context dengan createContext**
 
-### Slide 14: Membaca Objek dan Array (JSON.parse)
-
-Gunakan JSON.parse untuk mengkonversi kembali string JSON:
+createContext membuat object context baru dengan nilai default.
 
 ```javascript
-const getUserProfile = async () => {
-  try {
-    const jsonValue = await AsyncStorage.getItem("userProfile");
+import { createContext } from "react";
 
-    // Parse JSON string ke objek
-    const profile = jsonValue != null ? JSON.parse(jsonValue) : null;
+// Context untuk user authentication
+export const AuthContext = createContext({
+  user: null,
+  login: () => {},
+  logout: () => {},
+});
 
-    if (profile) {
-      console.log("Name:", profile.name);
-      console.log("Hobbies:", profile.hobbies);
-      return profile;
-    }
-  } catch (error) {
-    console.error("Error parsing:", error);
-  }
-};
-
-// Membaca array
-const getFavorites = async () => {
-  try {
-    const jsonArray = await AsyncStorage.getItem("favorites");
-    return jsonArray != null ? JSON.parse(jsonArray) : [];
-  } catch (error) {
-    console.error("Error:", error);
-    return [];
-  }
-};
-```
-
----
-
-### Slide 15: Best Practices AsyncStorage
-
-Praktik terbaik menggunakan AsyncStorage:
-
-```javascript
-// 1. Buat helper functions
-const storage = {
-  save: async (key, value) => {
-    try {
-      const jsonValue = JSON.stringify(value);
-      await AsyncStorage.setItem(key, jsonValue);
-    } catch (e) {
-      console.error("Save error:", e);
-    }
-  },
-
-  get: async (key) => {
-    try {
-      const jsonValue = await AsyncStorage.getItem(key);
-      return jsonValue != null ? JSON.parse(jsonValue) : null;
-    } catch (e) {
-      console.error("Get error:", e);
-      return null;
-    }
-  },
-
-  remove: async (key) => {
-    try {
-      await AsyncStorage.removeItem(key);
-    } catch (e) {
-      console.error("Remove error:", e);
-    }
-  },
-};
-
-// 2. Gunakan konstanta untuk keys
-const STORAGE_KEYS = {
-  USER_TOKEN: "@user_token",
-  USER_PROFILE: "@user_profile",
-  SETTINGS: "@app_settings",
-};
-
-// 3. Jangan simpan data sensitif tanpa enkripsi
-// 4. Batasi ukuran data (maksimal 6MB)
-// 5. Gunakan try-catch di semua operasi
-```
-
----
-
-### Slide 16: Pengenalan SQLite dalam React Native
-
-SQLite adalah database SQL embedded yang powerful untuk aplikasi mobile. Keunggulan:
-
-- Database relasional lengkap
-- Query SQL standard
-- Mendukung transaksi ACID
-- Performa tinggi untuk data kompleks
-- Zero-configuration
-
-SQLite cocok untuk aplikasi yang memerlukan relasi data, seperti aplikasi e-commerce, chat, atau inventory management.
-
----
-
-### Slide 17: Keunggulan SQLite untuk Data Kompleks
-
-SQLite unggul dalam skenario berikut:
-
-**Relasi Data:**
-
-```sql
--- Tabel Users
-CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT);
-
--- Tabel Orders dengan foreign key
-CREATE TABLE orders (
-  id INTEGER PRIMARY KEY,
-  user_id INTEGER,
-  total REAL,
-  FOREIGN KEY (user_id) REFERENCES users(id)
-);
-```
-
-**Query Kompleks:**
-
-```sql
--- JOIN multiple tables
-SELECT users.name, COUNT(orders.id) as total_orders
-FROM users
-LEFT JOIN orders ON users.id = orders.user_id
-GROUP BY users.id;
-```
-
-**Indexing untuk performa:**
-
-```sql
-CREATE INDEX idx_user_id ON orders(user_id);
-```
-
----
-
-### Slide 18: Instalasi expo-sqlite atau react-native-sqlite-storage
-
-Untuk Expo:
-
-```bash
-npx expo install expo-sqlite
-```
-
-Untuk React Native CLI:
-
-```bash
-npm install react-native-sqlite-storage
-```
-
-Import dalam komponen (Expo):
-
-```javascript
-import * as SQLite from "expo-sqlite";
-
-// Membuka database
-const db = SQLite.openDatabase("mydb.db");
-```
-
-Import untuk React Native CLI:
-
-```javascript
-import SQLite from "react-native-sqlite-storage";
-
-const db = SQLite.openDatabase({
-  name: "mydb.db",
-  location: "default",
+// Context untuk shopping cart
+export const CartContext = createContext({
+  items: [],
+  addItem: () => {},
+  removeItem: () => {},
 });
 ```
 
----
+**9. Implementasi Context Provider**
 
-### Slide 19: Membuka Koneksi Database SQLite
-
-Membuka atau membuat database baru:
+Provider component membungkus aplikasi dan menyediakan state beserta fungsi untuk mengubahnya.
 
 ```javascript
-import * as SQLite from "expo-sqlite";
+import React, { useState, createContext } from "react";
 
-// Membuka database (akan dibuat jika belum ada)
-const db = SQLite.openDatabase("notesapp.db");
+export const UserContext = createContext();
 
-// Fungsi untuk test koneksi
-const testConnection = () => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      "SELECT 1",
-      [],
-      (_, result) => console.log("Database connected"),
-      (_, error) => console.error("Connection failed:", error)
-    );
-  });
-};
+export function UserProvider({ children }) {
+  const [user, setUser] = useState(null);
 
-// Best practice: buat fungsi init database
-const initDatabase = () => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      `CREATE TABLE IF NOT EXISTS notes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        content TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )`,
-      [],
-      () => console.log("Table created"),
-      (_, error) => console.error("Error creating table:", error)
-    );
-  });
-};
-```
-
----
-
-### Slide 20: Membuat Tabel dengan SQL CREATE TABLE
-
-Syntax CREATE TABLE untuk mendefinisikan struktur data:
-
-```javascript
-const createTables = () => {
-  db.transaction((tx) => {
-    // Tabel users
-    tx.executeSql(
-      `CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )`
-    );
-
-    // Tabel categories
-    tx.executeSql(
-      `CREATE TABLE IF NOT EXISTS categories (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        color TEXT
-      )`
-    );
-
-    // Tabel notes dengan foreign keys
-    tx.executeSql(
-      `CREATE TABLE IF NOT EXISTS notes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        category_id INTEGER,
-        title TEXT NOT NULL,
-        content TEXT,
-        is_favorite INTEGER DEFAULT 0,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id),
-        FOREIGN KEY (category_id) REFERENCES categories(id)
-      )`
-    );
-  });
-};
-```
-
----
-
-### Slide 21: Insert Data ke SQLite (SQL INSERT)
-
-Menambahkan data ke tabel:
-
-```javascript
-// Insert single record
-const addNote = (title, content, userId) => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      "INSERT INTO notes (title, content, user_id) VALUES (?, ?, ?)",
-      [title, content, userId],
-      (_, result) => {
-        console.log("Note added with ID:", result.insertId);
-      },
-      (_, error) => {
-        console.error("Error inserting:", error);
-        return false;
-      }
-    );
-  });
-};
-
-// Insert multiple records
-const addMultipleNotes = (notesArray) => {
-  db.transaction(
-    (tx) => {
-      notesArray.forEach((note) => {
-        tx.executeSql(
-          "INSERT INTO notes (title, content, user_id) VALUES (?, ?, ?)",
-          [note.title, note.content, note.userId]
-        );
-      });
-    },
-    (error) => console.error("Transaction error:", error),
-    () => console.log("All notes inserted")
-  );
-};
-
-// Contoh penggunaan
-addNote("My First Note", "This is the content", 1);
-```
-
-Gunakan placeholder (?) untuk mencegah SQL injection.
-
----
-
-### Slide 22: Query Data dari SQLite (SQL SELECT)
-
-Mengambil data dari database:
-
-```javascript
-// SELECT semua data
-const getAllNotes = (callback) => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      "SELECT * FROM notes ORDER BY created_at DESC",
-      [],
-      (_, { rows }) => {
-        const notes = rows._array; // Expo SQLite
-        // atau rows.raw() untuk react-native-sqlite-storage
-        callback(notes);
-      }
-    );
-  });
-};
-
-// SELECT dengan WHERE clause
-const getNotesByUser = (userId, callback) => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      "SELECT * FROM notes WHERE user_id = ? ORDER BY created_at DESC",
-      [userId],
-      (_, { rows }) => callback(rows._array)
-    );
-  });
-};
-
-// SELECT dengan JOIN
-const getNotesWithCategory = (callback) => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      `SELECT notes.*, categories.name as category_name 
-       FROM notes 
-       LEFT JOIN categories ON notes.category_id = categories.id`,
-      [],
-      (_, { rows }) => callback(rows._array)
-    );
-  });
-};
-
-// Penggunaan dalam komponen
-const [notes, setNotes] = useState([]);
-
-useEffect(() => {
-  getAllNotes(setNotes);
-}, []);
-```
-
----
-
-### Slide 23: Update Data di SQLite (SQL UPDATE)
-
-Mengupdate data yang sudah ada:
-
-```javascript
-// Update single field
-const updateNoteTitle = (noteId, newTitle) => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      "UPDATE notes SET title = ? WHERE id = ?",
-      [newTitle, noteId],
-      (_, result) => {
-        console.log("Rows affected:", result.rowsAffected);
-      }
-    );
-  });
-};
-
-// Update multiple fields
-const updateNote = (noteId, title, content, categoryId) => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      `UPDATE notes 
-       SET title = ?, content = ?, category_id = ?
-       WHERE id = ?`,
-      [title, content, categoryId, noteId],
-      (_, result) => {
-        if (result.rowsAffected > 0) {
-          console.log("Note updated successfully");
-        } else {
-          console.log("Note not found");
-        }
-      }
-    );
-  });
-};
-
-// Toggle favorite
-const toggleFavorite = (noteId) => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      "UPDATE notes SET is_favorite = NOT is_favorite WHERE id = ?",
-      [noteId]
-    );
-  });
-};
-```
-
----
-
-### Slide 24: Delete Data dari SQLite (SQL DELETE)
-
-Menghapus data dari tabel:
-
-```javascript
-// Delete single record
-const deleteNote = (noteId) => {
-  db.transaction((tx) => {
-    tx.executeSql("DELETE FROM notes WHERE id = ?", [noteId], (_, result) => {
-      console.log("Deleted rows:", result.rowsAffected);
-    });
-  });
-};
-
-// Delete dengan kondisi
-const deleteOldNotes = (daysOld) => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      `DELETE FROM notes 
-       WHERE created_at < datetime('now', '-' || ? || ' days')`,
-      [daysOld],
-      (_, result) => {
-        console.log("Deleted old notes:", result.rowsAffected);
-      }
-    );
-  });
-};
-
-// Delete all (hati-hati!)
-const deleteAllNotes = () => {
-  db.transaction((tx) => {
-    tx.executeSql("DELETE FROM notes", [], (_, result) => {
-      console.log("All notes deleted");
-    });
-  });
-};
-
-// Soft delete (alternative)
-const softDeleteNote = (noteId) => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      "UPDATE notes SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?",
-      [noteId]
-    );
-  });
-};
-```
-
----
-
-### Slide 25: Menggunakan Transaction untuk Keamanan Data
-
-Transaction memastikan konsistensi data (all or nothing):
-
-```javascript
-// Transaction untuk operasi kompleks
-const transferNote = (noteId, fromUserId, toUserId) => {
-  db.transaction(
-    (tx) => {
-      // Step 1: Verifikasi note milik fromUser
-      tx.executeSql(
-        "SELECT id FROM notes WHERE id = ? AND user_id = ?",
-        [noteId, fromUserId],
-        (_, { rows }) => {
-          if (rows.length === 0) {
-            throw new Error("Note not found or unauthorized");
-          }
-        }
-      );
-
-      // Step 2: Update owner
-      tx.executeSql("UPDATE notes SET user_id = ? WHERE id = ?", [
-        toUserId,
-        noteId,
-      ]);
-
-      // Step 3: Log transfer
-      tx.executeSql(
-        "INSERT INTO transfer_logs (note_id, from_user, to_user) VALUES (?, ?, ?)",
-        [noteId, fromUserId, toUserId]
-      );
-    },
-    (error) => {
-      // Rollback otomatis jika error
-      console.error("Transaction failed:", error);
-    },
-    () => {
-      // Success callback
-      console.log("Transfer completed successfully");
-    }
-  );
-};
-
-// Transaction dengan async/await (Expo SQLite)
-const addNoteWithCategory = async (title, content, categoryName) => {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      // Insert category first
-      tx.executeSql(
-        "INSERT INTO categories (name) VALUES (?)",
-        [categoryName],
-        (_, result) => {
-          const categoryId = result.insertId;
-
-          // Then insert note with category
-          tx.executeSql(
-            "INSERT INTO notes (title, content, category_id) VALUES (?, ?, ?)",
-            [title, content, categoryId],
-            (_, noteResult) => resolve(noteResult.insertId)
-          );
-        }
-      );
-    }, reject);
-  });
-};
-```
-
----
-
-### Slide 26: Studi Kasus - Aplikasi Catatan dengan AsyncStorage
-
-Implementasi lengkap aplikasi catatan sederhana:
-
-```javascript
-import React, { useState, useEffect } from "react";
-import { View, TextInput, Button, FlatList, Text } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const NOTES_KEY = "@notes_storage";
-
-const NotesApp = () => {
-  const [notes, setNotes] = useState([]);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-
-  // Load notes on mount
-  useEffect(() => {
-    loadNotes();
-  }, []);
-
-  const loadNotes = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem(NOTES_KEY);
-      if (jsonValue !== null) {
-        setNotes(JSON.parse(jsonValue));
-      }
-    } catch (e) {
-      console.error("Error loading notes:", e);
-    }
+  const login = (userData) => {
+    setUser(userData);
   };
 
-  const saveNotes = async (newNotes) => {
-    try {
-      await AsyncStorage.setItem(NOTES_KEY, JSON.stringify(newNotes));
-      setNotes(newNotes);
-    } catch (e) {
-      console.error("Error saving notes:", e);
-    }
-  };
-
-  const addNote = () => {
-    if (title.trim() === "") return;
-
-    const newNote = {
-      id: Date.now().toString(),
-      title,
-      content,
-      createdAt: new Date().toISOString(),
-    };
-
-    saveNotes([...notes, newNote]);
-    setTitle("");
-    setContent("");
-  };
-
-  const deleteNote = (id) => {
-    const filtered = notes.filter((note) => note.id !== id);
-    saveNotes(filtered);
+  const logout = () => {
+    setUser(null);
   };
 
   return (
-    <View style={{ padding: 20 }}>
-      <TextInput
-        placeholder="Title"
-        value={title}
-        onChangeText={setTitle}
-        style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
-      />
-      <TextInput
-        placeholder="Content"
-        value={content}
-        onChangeText={setContent}
-        multiline
-        style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
-      />
-      <Button title="Add Note" onPress={addNote} />
+    <UserContext.Provider value={{ user, login, logout }}>
+      {children}
+    </UserContext.Provider>
+  );
+}
+```
 
-      <FlatList
-        data={notes}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={{ padding: 10, borderBottomWidth: 1 }}>
-            <Text style={{ fontWeight: "bold" }}>{item.title}</Text>
-            <Text>{item.content}</Text>
-            <Button title="Delete" onPress={() => deleteNote(item.id)} />
-          </View>
-        )}
-      />
+**10. Mengakses Data dengan useContext Hook**
+
+useContext hook memudahkan akses data dari context tanpa Consumer component.
+
+```javascript
+import { useContext } from "react";
+import { UserContext } from "./UserContext";
+
+function ProfileScreen() {
+  const { user, logout } = useContext(UserContext);
+
+  return (
+    <View>
+      <Text>Welcome, {user?.name}</Text>
+      <Button title="Logout" onPress={logout} />
     </View>
   );
-};
+}
+```
 
-export default NotesApp;
+**11. Keuntungan dan Keterbatasan Context API**
+
+Keuntungan: Built-in React, mudah dipelajari, cocok untuk state sederhana.
+Keterbatasan: Performance issues pada update sering, sulit debug, tidak ada middleware.
+
+```javascript
+// Keuntungan: Simple setup
+const ThemeContext = createContext();
+
+// Keterbatasan: Semua consumer re-render saat context berubah
+function App() {
+  const [theme, setTheme] = useState("light");
+  const [user, setUser] = useState(null);
+
+  // Jika theme berubah, semua consumer re-render
+  // meskipun hanya butuh user data
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme, user, setUser }}>
+      <AppContent />
+    </ThemeContext.Provider>
+  );
+}
+```
+
+**12. Best Practices Context API**
+
+Pisahkan context berdasarkan concern, gunakan custom hooks, dan hindari nested providers yang dalam.
+
+```javascript
+// ✅ Good: Pisah context berdasarkan fungsi
+const AuthContext = createContext();
+const ThemeContext = createContext();
+const CartContext = createContext();
+
+// ✅ Good: Custom hook untuk akses context
+function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+  return context;
+}
+
+// ❌ Bad: Satu context untuk semua
+const AppContext = createContext(); // auth, theme, cart, dll
 ```
 
 ---
 
-### Slide 27: Studi Kasus - Aplikasi To-Do List dengan SQLite
+### Redux Fundamentals
 
-Implementasi aplikasi to-do list dengan SQLite:
+**13. Pengenalan Redux**
+
+Redux adalah library state management yang menggunakan pola predictable state container. Redux membuat state management lebih terstruktur dan mudah di-debug.
 
 ```javascript
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  TextInput,
-  Button,
-  FlatList,
-  Text,
-  TouchableOpacity,
-} from "react-native";
-import * as SQLite from "expo-sqlite";
+// Konsep dasar Redux
+// State disimpan di satu tempat (store)
+// State hanya diubah melalui actions
+// Perubahan ditangani oleh pure functions (reducers)
 
-const db = SQLite.openDatabase("todos.db");
+import { createStore } from "redux";
+```
 
-const TodoApp = () => {
-  const [todos, setTodos] = useState([]);
-  const [inputText, setInputText] = useState("");
+**14. Tiga Prinsip Dasar Redux**
 
-  useEffect(() => {
-    initDatabase();
-    loadTodos();
-  }, []);
+Single source of truth, State is read-only, Changes are made with pure functions.
 
-  const initDatabase = () => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        `CREATE TABLE IF NOT EXISTS todos (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          text TEXT NOT NULL,
-          completed INTEGER DEFAULT 0,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )`
+```javascript
+// 1. Single source of truth
+const store = createStore(reducer);
+// Semua state ada di satu object tree
+
+// 2. State is read-only
+// state tidak bisa diubah langsung
+// state.count = 5; // ❌ SALAH
+
+// 3. Pure functions (reducers)
+function counterReducer(state = 0, action) {
+  // Tidak mengubah state lama, return state baru
+  switch (action.type) {
+    case "INCREMENT":
+      return state + 1;
+    default:
+      return state;
+  }
+}
+```
+
+**15. Arsitektur Redux (Store, Action, Reducer)**
+
+Redux memiliki tiga komponen utama yang bekerja dalam siklus unidirectional data flow.
+
+```javascript
+// ACTION: Object yang mendeskripsikan perubahan
+const incrementAction = {
+  type: "INCREMENT",
+  payload: 1,
+};
+
+// REDUCER: Pure function yang mengubah state
+function counterReducer(state = 0, action) {
+  switch (action.type) {
+    case "INCREMENT":
+      return state + action.payload;
+    default:
+      return state;
+  }
+}
+
+// STORE: Menyimpan state dan menghubungkan action-reducer
+import { createStore } from "redux";
+const store = createStore(counterReducer);
+```
+
+**16. Redux Data Flow**
+
+Data mengalir satu arah: View → Action → Reducer → Store → View.
+
+```javascript
+// 1. User interaction di View
+<Button onPress={() => dispatch({ type: "INCREMENT" })} />;
+
+// 2. Dispatch action
+dispatch({ type: "INCREMENT", payload: 1 });
+
+// 3. Reducer memproses action
+function reducer(state, action) {
+  if (action.type === "INCREMENT") {
+    return state + action.payload;
+  }
+}
+
+// 4. Store update state baru
+// store.getState() // nilai baru
+
+// 5. View re-render dengan state baru
+const count = useSelector((state) => state.count);
+```
+
+**17. Apa itu Action?**
+
+Action adalah plain JavaScript object yang memiliki property type dan opsional payload untuk data tambahan.
+
+```javascript
+// Action sederhana
+const loginAction = {
+  type: "LOGIN",
+  payload: {
+    username: "john",
+    email: "john@example.com",
+  },
+};
+
+// Action untuk berbagai operasi
+const addTodoAction = {
+  type: "ADD_TODO",
+  payload: { id: 1, text: "Belajar Redux", completed: false },
+};
+
+const deleteTodoAction = {
+  type: "DELETE_TODO",
+  payload: 1, // id todo
+};
+
+const toggleTodoAction = {
+  type: "TOGGLE_TODO",
+  payload: 1,
+};
+```
+
+**18. Apa itu Reducer?**
+
+Reducer adalah pure function yang menerima state lama dan action, mengembalikan state baru tanpa mengubah state lama.
+
+```javascript
+// Reducer untuk counter
+function counterReducer(state = 0, action) {
+  switch (action.type) {
+    case "INCREMENT":
+      return state + 1;
+    case "DECREMENT":
+      return state - 1;
+    case "RESET":
+      return 0;
+    default:
+      return state;
+  }
+}
+
+// Reducer untuk todos
+function todosReducer(state = [], action) {
+  switch (action.type) {
+    case "ADD_TODO":
+      return [...state, action.payload];
+    case "DELETE_TODO":
+      return state.filter((todo) => todo.id !== action.payload);
+    case "TOGGLE_TODO":
+      return state.map((todo) =>
+        todo.id === action.payload
+          ? { ...todo, completed: !todo.completed }
+          : todo
       );
+    default:
+      return state;
+  }
+}
+```
+
+**19. Apa itu Store?**
+
+Store adalah object yang menyimpan state tree aplikasi. Store memiliki method dispatch, getState, dan subscribe.
+
+```javascript
+import { createStore } from "redux";
+
+const store = createStore(counterReducer);
+
+// getState: mengambil state saat ini
+console.log(store.getState()); // 0
+
+// dispatch: mengirim action
+store.dispatch({ type: "INCREMENT" });
+console.log(store.getState()); // 1
+
+// subscribe: listen perubahan state
+const unsubscribe = store.subscribe(() => {
+  console.log("State berubah:", store.getState());
+});
+
+// unsubscribe ketika tidak diperlukan
+unsubscribe();
+```
+
+---
+
+### Implementasi Redux
+
+**20. Setup Redux dalam React Native**
+
+Install dependencies dan setup store provider di root aplikasi.
+
+```javascript
+// Install packages
+// npm install redux react-redux @reduxjs/toolkit
+
+// store.js
+import { configureStore } from "@reduxjs/toolkit";
+import counterReducer from "./counterSlice";
+
+export const store = configureStore({
+  reducer: {
+    counter: counterReducer,
+  },
+});
+
+// App.js
+import { Provider } from "react-redux";
+import { store } from "./store";
+
+export default function App() {
+  return (
+    <Provider store={store}>
+      <MainApp />
+    </Provider>
+  );
+}
+```
+
+**21. Membuat Actions dan Action Creators**
+
+Action creators adalah fungsi yang mengembalikan action object untuk memudahkan pembuatan action.
+
+```javascript
+// Action types
+const INCREMENT = "INCREMENT";
+const DECREMENT = "DECREMENT";
+const INCREMENT_BY_AMOUNT = "INCREMENT_BY_AMOUNT";
+
+// Action creators
+function increment() {
+  return { type: INCREMENT };
+}
+
+function decrement() {
+  return { type: DECREMENT };
+}
+
+function incrementByAmount(amount) {
+  return {
+    type: INCREMENT_BY_AMOUNT,
+    payload: amount,
+  };
+}
+
+// Penggunaan
+dispatch(increment());
+dispatch(incrementByAmount(5));
+
+// Action creators untuk todos
+function addTodo(text) {
+  return {
+    type: "ADD_TODO",
+    payload: {
+      id: Date.now(),
+      text: text,
+      completed: false,
+    },
+  };
+}
+```
+
+**22. Membuat Reducers**
+
+Reducer menangani berbagai action types dan mengubah state sesuai logika bisnis.
+
+```javascript
+// counterReducer.js
+const initialState = {
+  value: 0,
+  status: "idle",
+};
+
+function counterReducer(state = initialState, action) {
+  switch (action.type) {
+    case "INCREMENT":
+      return {
+        ...state,
+        value: state.value + 1,
+      };
+    case "DECREMENT":
+      return {
+        ...state,
+        value: state.value - 1,
+      };
+    case "INCREMENT_BY_AMOUNT":
+      return {
+        ...state,
+        value: state.value + action.payload,
+      };
+    case "RESET":
+      return initialState;
+    default:
+      return state;
+  }
+}
+
+export default counterReducer;
+```
+
+**23. Menggabungkan Multiple Reducers (combineReducers)**
+
+combineReducers menggabungkan beberapa reducer menjadi satu root reducer.
+
+```javascript
+import { combineReducers } from "redux";
+
+// Reducer terpisah
+function userReducer(state = null, action) {
+  switch (action.type) {
+    case "LOGIN":
+      return action.payload;
+    case "LOGOUT":
+      return null;
+    default:
+      return state;
+  }
+}
+
+function todosReducer(state = [], action) {
+  switch (action.type) {
+    case "ADD_TODO":
+      return [...state, action.payload];
+    default:
+      return state;
+  }
+}
+
+// Gabungkan reducers
+const rootReducer = combineReducers({
+  user: userReducer,
+  todos: todosReducer,
+  counter: counterReducer,
+});
+
+// State structure:
+// {
+//   user: null,
+//   todos: [],
+//   counter: { value: 0, status: 'idle' }
+// }
+```
+
+**24. Konfigurasi Store**
+
+Store dikonfigurasi dengan root reducer dan optional middleware.
+
+```javascript
+import { createStore, applyMiddleware } from "redux";
+import { configureStore } from "@reduxjs/toolkit";
+import rootReducer from "./reducers";
+
+// Cara 1: Manual dengan createStore
+const store = createStore(rootReducer);
+
+// Cara 2: Dengan Redux Toolkit (recommended)
+export const store = configureStore({
+  reducer: {
+    user: userReducer,
+    todos: todosReducer,
+    counter: counterReducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
+});
+
+export default store;
+```
+
+**25. Menggunakan Provider dari react-redux**
+
+Provider component membuat Redux store tersedia untuk seluruh aplikasi.
+
+```javascript
+import React from "react";
+import { Provider } from "react-redux";
+import { store } from "./store";
+import { NavigationContainer } from "@react-navigation/native";
+import MainNavigator from "./navigation/MainNavigator";
+
+export default function App() {
+  return (
+    <Provider store={store}>
+      <NavigationContainer>
+        <MainNavigator />
+      </NavigationContainer>
+    </Provider>
+  );
+}
+
+// Semua komponen di dalam Provider bisa akses store
+```
+
+**26. Mengakses State dengan useSelector**
+
+useSelector hook mengambil data dari Redux store berdasarkan selector function.
+
+```javascript
+import { useSelector } from "react-redux";
+
+function CounterScreen() {
+  // Akses state counter
+  const count = useSelector((state) => state.counter.value);
+  const status = useSelector((state) => state.counter.status);
+
+  // Akses nested state
+  const user = useSelector((state) => state.user);
+  const userName = useSelector((state) => state.user?.name);
+
+  // Multiple selectors
+  const todos = useSelector((state) => state.todos);
+  const completedTodos = useSelector((state) =>
+    state.todos.filter((todo) => todo.completed)
+  );
+
+  return (
+    <View>
+      <Text>Count: {count}</Text>
+      <Text>Status: {status}</Text>
+      <Text>User: {userName}</Text>
+      <Text>Completed: {completedTodos.length}</Text>
+    </View>
+  );
+}
+```
+
+**27. Dispatch Actions dengan useDispatch**
+
+useDispatch hook mengembalikan dispatch function untuk mengirim actions.
+
+```javascript
+import { useDispatch, useSelector } from "react-redux";
+import { Button, View, Text } from "react-native";
+
+function CounterScreen() {
+  const dispatch = useDispatch();
+  const count = useSelector((state) => state.counter.value);
+
+  const handleIncrement = () => {
+    dispatch({ type: "INCREMENT" });
+  };
+
+  const handleDecrement = () => {
+    dispatch({ type: "DECREMENT" });
+  };
+
+  const handleIncrementByAmount = () => {
+    dispatch({
+      type: "INCREMENT_BY_AMOUNT",
+      payload: 5,
     });
   };
 
-  const loadTodos = () => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT * FROM todos ORDER BY created_at DESC",
-        [],
-        (_, { rows }) => setTodos(rows._array)
-      );
-    });
-  };
-
-  const addTodo = () => {
-    if (inputText.trim() === "") return;
-
-    db.transaction((tx) => {
-      tx.executeSql("INSERT INTO todos (text) VALUES (?)", [inputText], () => {
-        setInputText("");
-        loadTodos();
-      });
-    });
-  };
-
-  const toggleComplete = (id, currentStatus) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "UPDATE todos SET completed = ? WHERE id = ?",
-        [currentStatus ? 0 : 1, id],
-        () => loadTodos()
-      );
-    });
-  };
-
-  const deleteTodo = (id) => {
-    db.transaction((tx) => {
-      tx.executeSql("DELETE FROM todos WHERE id = ?", [id], () => loadTodos());
-    });
+  const handleReset = () => {
+    dispatch({ type: "RESET" });
   };
 
   return (
-    <View style={{ padding: 20 }}>
-      <View style={{ flexDirection: "row", marginBottom: 20 }}>
-        <TextInput
-          value={inputText}
-          onChangeText={setInputText}
-          placeholder="Enter todo"
-          style={{ flex: 1, borderWidth: 1, padding: 10 }}
-        />
-        <Button title="Add" onPress={addTodo} />
-      </View>
+    <View>
+      <Text>Count: {count}</Text>
+      <Button title="+" onPress={handleIncrement} />
+      <Button title="-" onPress={handleDecrement} />
+      <Button title="+5" onPress={handleIncrementByAmount} />
+      <Button title="Reset" onPress={handleReset} />
+    </View>
+  );
+}
+```
+
+---
+
+### Perbandingan dan Studi Kasus
+
+**28. Context API vs Redux: Kapan Menggunakan?**
+
+Context API cocok untuk state sederhana dan jarang berubah. Redux cocok untuk aplikasi kompleks dengan banyak state updates.
+
+```javascript
+// Gunakan Context API untuk:
+// - Theme switching
+// - User authentication (simple)
+// - Language/i18n
+
+const ThemeContext = createContext();
+
+function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState("light");
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+// Gunakan Redux untuk:
+// - Shopping cart dengan banyak operasi
+// - Complex forms
+// - Real-time data updates
+// - Undo/redo functionality
+
+const cartSlice = createSlice({
+  name: "cart",
+  initialState: { items: [], total: 0 },
+  reducers: {
+    addItem: (state, action) => {
+      state.items.push(action.payload);
+      state.total += action.payload.price;
+    },
+    removeItem: (state, action) => {
+      // complex logic
+    },
+  },
+});
+```
+
+**29. Contoh Kasus: Todo List dengan State Management**
+
+Implementasi lengkap todo list menggunakan Redux.
+
+```javascript
+// todoSlice.js
+import { createSlice } from "@reduxjs/toolkit";
+
+const todoSlice = createSlice({
+  name: "todos",
+  initialState: [],
+  reducers: {
+    addTodo: (state, action) => {
+      state.push({
+        id: Date.now(),
+        text: action.payload,
+        completed: false,
+      });
+    },
+    toggleTodo: (state, action) => {
+      const todo = state.find((t) => t.id === action.payload);
+      if (todo) {
+        todo.completed = !todo.completed;
+      }
+    },
+    deleteTodo: (state, action) => {
+      return state.filter((t) => t.id !== action.payload);
+    },
+  },
+});
+
+export const { addTodo, toggleTodo, deleteTodo } = todoSlice.actions;
+export default todoSlice.reducer;
+
+// TodoScreen.js
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addTodo, toggleTodo, deleteTodo } from "./todoSlice";
+
+function TodoScreen() {
+  const [text, setText] = useState("");
+  const dispatch = useDispatch();
+  const todos = useSelector((state) => state.todos);
+
+  const handleAdd = () => {
+    if (text.trim()) {
+      dispatch(addTodo(text));
+      setText("");
+    }
+  };
+
+  return (
+    <View>
+      <TextInput value={text} onChangeText={setText} placeholder="Add todo" />
+      <Button title="Add" onPress={handleAdd} />
 
       <FlatList
         data={todos}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View
-            style={{
-              flexDirection: "row",
-              padding: 10,
-              borderBottomWidth: 1,
-              alignItems: "center",
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => toggleComplete(item.id, item.completed)}
-              style={{ flex: 1 }}
-            >
+          <View>
+            <TouchableOpacity onPress={() => dispatch(toggleTodo(item.id))}>
               <Text
                 style={{
                   textDecorationLine: item.completed ? "line-through" : "none",
@@ -1056,151 +840,58 @@ const TodoApp = () => {
             </TouchableOpacity>
             <Button
               title="Delete"
-              onPress={() => deleteTodo(item.id)}
-              color="red"
+              onPress={() => dispatch(deleteTodo(item.id))}
             />
           </View>
         )}
       />
     </View>
   );
-};
-
-export default TodoApp;
+}
 ```
 
----
+**30. Tips Memilih State Management Solution**
 
-### Slide 28: Error Handling dalam Storage Lokal
-
-Best practices untuk menangani error:
+Pertimbangkan kompleksitas aplikasi, ukuran tim, dan kebutuhan debugging sebelum memilih solusi.
 
 ```javascript
-// AsyncStorage error handling
-const safeAsyncStorage = {
-  setItem: async (key, value) => {
-    try {
-      const jsonValue = JSON.stringify(value);
-      await AsyncStorage.setItem(key, jsonValue);
-      return { success: true };
-    } catch (error) {
-      console.error("AsyncStorage setItem error:", error);
-      // Handle specific errors
-      if (error.message.includes("QuotaExceededError")) {
-        return { success: false, error: "Storage limit exceeded" };
-      }
-      return { success: false, error: error.message };
-    }
-  },
+// Decision Tree:
 
-  getItem: async (key, defaultValue = null) => {
-    try {
-      const jsonValue = await AsyncStorage.getItem(key);
-      return jsonValue != null ? JSON.parse(jsonValue) : defaultValue;
-    } catch (error) {
-      console.error("AsyncStorage getItem error:", error);
-      return defaultValue;
-    }
-  },
-};
+// Aplikasi kecil (< 5 screens)
+// → useState + props
 
-// SQLite error handling
-const safeSQLExecute = (sql, params = []) => {
-  return new Promise((resolve, reject) => {
-    db.transaction(
-      (tx) => {
-        tx.executeSql(
-          sql,
-          params,
-          (_, result) => resolve(result),
-          (_, error) => {
-            console.error("SQL Error:", error);
-            // Handle specific SQL errors
-            if (error.message.includes("UNIQUE constraint")) {
-              reject(new Error("Duplicate entry"));
-            } else if (error.message.includes("no such table")) {
-              reject(new Error("Table does not exist"));
-            } else {
-              reject(error);
-            }
-            return false;
-          }
-        );
-      },
-      (error) => reject(error)
-    );
-  });
-};
+// Aplikasi sedang (5-15 screens)
+// State jarang berubah → Context API
+const AuthContext = createContext();
 
-// Contoh penggunaan dengan user feedback
-const saveUserProfile = async (profile) => {
-  const result = await safeAsyncStorage.setItem("profile", profile);
-  if (!result.success) {
-    Alert.alert("Error", `Failed to save: ${result.error}`);
-  }
-};
-```
+// Aplikasi besar (> 15 screens)
+// State sering berubah → Redux
+// Banyak async operations → Redux + Redux Thunk/Saga
+import { configureStore } from "@reduxjs/toolkit";
 
----
+// Tips praktis:
+// 1. Mulai dengan useState
+// 2. Upgrade ke Context jika props drilling
+// 3. Upgrade ke Redux jika:
+//    - Banyak shared state
+//    - Complex state logic
+//    - Perlu time-travel debugging
+//    - State updates dari banyak tempat
 
-### Slide 29: Migrasi Data dan Versioning Database
-
-Mengelola perubahan struktur database:
-
-```javascript
-const DATABASE_VERSION = 3;
-const VERSION_KEY = "@db_version";
-
-const migrateDatabase = async () => {
-  try {
-    const currentVersion = await AsyncStorage.getItem(VERSION_KEY);
-    const version = currentVersion ? parseInt(currentVersion) : 0;
-
-    if (version < DATABASE_VERSION) {
-      db.transaction(
-        (tx) => {
-          // Migration version 1 to 2
-          if (version < 2) {
-            tx.executeSql("ALTER TABLE notes ADD COLUMN category_id INTEGER");
-            console.log("Migrated to version 2");
-          }
-
-          // Migration version 2 to 3
-          if (version < 3) {
-            tx.executeSql(
-              `CREATE TABLE IF NOT EXISTS tags (
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              name TEXT UNIQUE NOT NULL
-            )`
-            );
-            tx.executeSql(
-              `CREATE TABLE IF NOT EXISTS note_tags (
-              note_id INTEGER,
-              tag_id INTEGER,
-              FOREIGN KEY (note_id) REFERENCES notes(id),
-              FOREIGN KEY (tag_id) REFERENCES tags(id),
-              PRIMARY KEY (note_id, tag_id)
-            )`
-            );
-            console.log("Migrated to version 3");
-          }
-        },
-        (error) => console.error("Migration failed:", error),
-        async () => {
-          await AsyncStorage.setItem(VERSION_KEY, DATABASE_VERSION.toString());
-          console.log("Migration completed");
-        }
-      );
-    }
-  } catch (error) {
-    console.error("Migration error:", error);
-  }
-};
-
-// Panggil saat aplikasi start
-useEffect(() => {
-  migrateDatabase();
-}, []);
+// Hybrid approach (Best practice)
+function App() {
+  return (
+    <Provider store={reduxStore}>
+      <ThemeContext.Provider value={theme}>
+        <AuthContext.Provider value={auth}>
+          <AppContent />
+        </AuthContext.Provider>
+      </ThemeContext.Provider>
+    </Provider>
+  );
+}
+// Redux untuk business logic
+// Context untuk UI preferences
 ```
 
 ---
@@ -1211,25 +902,25 @@ useEffect(() => {
 
 ## Soal 1
 
-Apa keuntungan utama menggunakan penyimpanan lokal (local storage) dalam aplikasi mobile?
+Apa masalah utama yang diselesaikan oleh state management global?
 
-A. Mempercantik tampilan aplikasi
-B. Aplikasi dapat berfungsi offline dan akses data lebih cepat
-C. Mengurangi ukuran file aplikasi
-D. Meningkatkan kualitas gambar
+A. Meningkatkan kecepatan aplikasi
+B. Mengurangi ukuran bundle aplikasi
+C. Menghindari props drilling
+D. Membuat UI lebih menarik
 
-**Jawaban: B**
+**Jawaban: C**
 
 ---
 
 ## Soal 2
 
-Kapan sebaiknya kita menggunakan AsyncStorage dibandingkan SQLite?
+Apa fungsi dari `createContext()` dalam React Context API?
 
-A. Untuk menyimpan data terstruktur dengan relasi kompleks
-B. Untuk data sederhana seperti token autentikasi dan pengaturan aplikasi
-C. Untuk data yang memerlukan JOIN query
-D. Untuk data berukuran lebih dari 10MB
+A. Membuat komponen baru
+B. Membuat object context untuk menyimpan dan berbagi data
+C. Membuat state lokal
+D. Membuat reducer function
 
 **Jawaban: B**
 
@@ -1237,12 +928,12 @@ D. Untuk data berukuran lebih dari 10MB
 
 ## Soal 3
 
-Apa tipe data yang dapat disimpan langsung di AsyncStorage?
+Hook mana yang digunakan untuk mengakses data dari Context API?
 
-A. Object dan Array
-B. Number dan Boolean
-C. Hanya String
-D. Semua tipe data JavaScript
+A. useState
+B. useEffect
+C. useContext
+D. useReducer
 
 **Jawaban: C**
 
@@ -1250,25 +941,25 @@ D. Semua tipe data JavaScript
 
 ## Soal 4
 
-Metode apa yang digunakan untuk menyimpan data ke AsyncStorage?
+Berapa banyak prinsip dasar Redux?
 
-A. `AsyncStorage.save(key, value)`
-B. `AsyncStorage.setItem(key, value)`
-C. `AsyncStorage.write(key, value)`
-D. `AsyncStorage.put(key, value)`
+A. 2 prinsip
+B. 3 prinsip
+C. 4 prinsip
+D. 5 prinsip
 
-**Jawaban: B**
+**Jawaban: B** (Single source of truth, State is read-only, Changes with pure functions)
 
 ---
 
 ## Soal 5
 
-Bagaimana cara menyimpan object JavaScript ke AsyncStorage?
+Dalam Redux, apa yang dimaksud dengan Action?
 
-A. Langsung menyimpan object tanpa konversi
-B. Menggunakan `JSON.stringify()` untuk konversi ke string
-C. Menggunakan `toString()` method
-D. Menggunakan `Object.freeze()`
+A. Fungsi yang mengubah state
+B. Plain object dengan property type yang mendeskripsikan perubahan
+C. Komponen React
+D. Method untuk mengambil state
 
 **Jawaban: B**
 
@@ -1276,51 +967,51 @@ D. Menggunakan `Object.freeze()`
 
 ## Soal 6
 
-Apa kepanjangan dari SQL dalam SQLite?
+Apa tugas utama dari Reducer dalam Redux?
 
-A. Simple Query Language
-B. Structured Query Language
-C. Standard Quality Language
-D. System Query Library
-
-**Jawaban: B**
-
----
-
-## Soal 7
-
-Query SQL mana yang digunakan untuk menambahkan data ke tabel?
-
-A. `CREATE INTO table_name`
-B. `ADD TO table_name`
-C. `INSERT INTO table_name`
-D. `APPEND INTO table_name`
+A. Menampilkan UI ke user
+B. Mengirim request ke API
+C. Pure function yang menerima state dan action, mengembalikan state baru
+D. Menyimpan data ke database
 
 **Jawaban: C**
 
 ---
 
-## Soal 8
+## Soal 7
 
-Apa fungsi dari placeholder `?` dalam query SQLite?
+Hook mana yang digunakan untuk mengakses state dari Redux store?
 
-A. Untuk membuat query lebih cepat
-B. Untuk mencegah SQL injection dengan parameterized query
-C. Untuk membuat query terlihat lebih rapi
-D. Untuk menandai query yang belum selesai
+A. useStore
+B. useSelector
+C. useRedux
+D. useState
 
 **Jawaban: B**
 
 ---
 
+## Soal 8
+
+Hook mana yang digunakan untuk mengirim action ke Redux store?
+
+A. useSend
+B. useAction
+C. useDispatch
+D. useUpdate
+
+**Jawaban: C**
+
+---
+
 ## Soal 9
 
-Apa kegunaan Transaction dalam SQLite?
+Kapan sebaiknya menggunakan Context API dibandingkan Redux?
 
-A. Mempercepat eksekusi query
-B. Memastikan konsistensi data dengan prinsip all-or-nothing
-C. Mengurangi ukuran database
-D. Mengenkripsi data otomatis
+A. Untuk aplikasi dengan state kompleks dan sering berubah
+B. Untuk state sederhana yang jarang berubah seperti theme atau auth
+C. Untuk aplikasi e-commerce dengan shopping cart
+D. Untuk aplikasi yang memerlukan time-travel debugging
 
 **Jawaban: B**
 
@@ -1328,15 +1019,15 @@ D. Mengenkripsi data otomatis
 
 ## Soal 10
 
-Metode SQL mana yang digunakan untuk mengambil data dari tabel?
+Fungsi apa yang digunakan untuk menggabungkan multiple reducers di Redux?
 
-A. `GET FROM table_name`
-B. `FETCH FROM table_name`
-C. `SELECT FROM table_name`
-D. `RETRIEVE FROM table_name`
+A. mergeReducers()
+B. joinReducers()
+C. combineReducers()
+D. connectReducers()
 
 **Jawaban: C**
 
 ---
 
-**Selamat! Anda telah menyelesaikan materi Database Lokal (AsyncStorage / SQLite)** 🎉
+**Selamat! Anda telah menyelesaikan materi State Management dengan Redux/Context API** 🎉

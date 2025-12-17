@@ -101,19 +101,21 @@
 
 ### Pertemuan 11
 
-- Materi: State Management dengan Redux/Context API
-- OBE Outcome: Mahasiswa memahami manajemen state global.
-- Aktivitas: Latihan membuat todo list dengan Redux/Context.
-- Asesmen: Mini project state management.
+- Materi: Database Lokal (AsyncStorage / SQLite)
+- OBE Outcome: Mahasiswa mampu menyimpan data secara lokal.
+- Aktivitas: Implementasi aplikasi catatan menggunakan AsyncStorage/SQLite.
+- Asesmen: Tugas aplikasi catatan sederhana.
+
 - Slides :
   - https://fast-ibbi.github.io/kamis-vii-p1/pertemuan-11
 
 ### Pertemuan 12
 
-- Materi: Database Lokal (AsyncStorage / SQLite)
-- OBE Outcome: Mahasiswa mampu menyimpan data secara lokal.
-- Aktivitas: Implementasi aplikasi catatan menggunakan AsyncStorage/SQLite.
-- Asesmen: Tugas aplikasi catatan sederhana.
+- Materi: State Management dengan Redux/Context API
+- OBE Outcome: Mahasiswa memahami manajemen state global.
+- Aktivitas: Latihan membuat todo list dengan Redux/Context.
+- Asesmen: Mini project state management.
+
 - Slides :
   - https://fast-ibbi.github.io/kamis-vii-p1/pertemuan-12
 
