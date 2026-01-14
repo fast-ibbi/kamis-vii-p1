@@ -1,946 +1,883 @@
+# QR Code Reader App 📱
+
+Tutorial lengkap membuat aplikasi pembaca QR Code dengan React Native dan Expo. Aplikasi ini dapat memindai QR code, mendeteksi URL, dan mengirim nama pengguna ke URL yang dipindai melalui HTTP POST request.
+
+## 📋 Daftar Isi
+
+- [Fitur Aplikasi](#fitur-aplikasi)
+- [Prerequisites](#prerequisites)
+- [Tutorial Pembuatan](#tutorial-pembuatan)
+  - [Langkah 1: Setup Project](#langkah-1-setup-project)
+  - [Langkah 2: Install Dependencies](#langkah-2-install-dependencies)
+  - [Langkah 3: Konfigurasi Root Layout](#langkah-3-konfigurasi-root-layout)
+  - [Langkah 4: Membuat QR Scanner Screen](#langkah-4-membuat-qr-scanner-screen)
+  - [Langkah 5: Testing Aplikasi](#langkah-5-testing-aplikasi)
+- [Cara Kerja](#cara-kerja)
+- [Troubleshooting](#troubleshooting)
+
+## ✨ Fitur Aplikasi
+
+- 📷 Akses kamera untuk memindai QR code
+- 🔍 Deteksi otomatis QR code dan barcode PDF417
+- 🌐 Deteksi URL otomatis dari QR code
+- 👤 Input nama pengguna via modal
+- 📤 Kirim data via HTTP POST ke URL yang dipindai
+- 🔄 Fitur scan ulang
+- 🎯 Visual guide untuk scanning
+- 📱 Cross-platform (iOS & Android)
+
+## 🔧 Prerequisites
+
+Pastikan Anda sudah menginstall:
+
+- Node.js (versi 18 atau lebih tinggi)
+- npm atau yarn
+- Expo CLI
+- Aplikasi Expo Go di smartphone (untuk testing)
+- Text editor (VS Code recommended)
+
 ---
-title: Multimedia dan Device API (Camera, Location, Notification)
-version: 1.0.0
-header: Multimedia dan Device API (Camera, Location, Notification)
-footer: https://github.com/fast-ibbi/kamis-vii-p1
-paginate: true
-marp: true
----
 
-<!--
-_class: lead
-_paginate: skip
--->
+## 📖 Tutorial Pembuatan
 
-# **Multimedia dan Device API (Camera, Location, Notification)**
+### Langkah 1: Setup Project
 
----
+#### 1.1 Buat Project Expo Baru
 
-### Slide 1: Judul: Multimedia dan Device API dengan Expo
+Buka terminal dan jalankan perintah berikut:
 
-Pertemuan 13 membahas integrasi fitur multimedia dan device API dalam aplikasi React Native menggunakan Expo. Materi mencakup akses kamera, galeri foto, lokasi GPS, dan notifikasi untuk menciptakan aplikasi mobile yang lebih interaktif.
-
-### Slide 2: Tujuan Pembelajaran Pertemuan 13
-
-Mahasiswa mampu mengintegrasikan fitur device native seperti kamera, galeri, GPS, dan notifikasi dalam aplikasi React Native. Mahasiswa memahami cara menangani permission secara proper dan mengimplementasikan best practices dalam penggunaan device API.
-
-### Slide 3: Mengapa Multimedia Penting dalam Aplikasi Mobile?
-
-Fitur multimedia meningkatkan user experience dan interaktivitas aplikasi. Aplikasi modern seperti Instagram, WhatsApp, dan Gojek sangat bergantung pada akses kamera, lokasi, dan media library. Kemampuan mengakses hardware device membuat aplikasi lebih powerful dan sesuai kebutuhan user.
-
-### Slide 4: Overview Device API yang Akan Dipelajari
-
-API yang akan dipelajari meliputi:
-
-- Camera: Mengambil foto dan video
-- Image Picker: Akses galeri dan kamera
-- Location: Mendapatkan koordinat GPS
-- Notifications: Mengirim notifikasi lokal
-- Media Library: Mengakses file media device
-
-### Slide 5: Perbedaan Expo CLI vs React Native CLI untuk Device Access
-
-Expo menyediakan pre-built modules yang mudah digunakan tanpa konfigurasi native code. React Native CLI memerlukan linking manual dan konfigurasi platform-specific. Expo cocok untuk rapid development, sedangkan RN CLI memberikan kontrol lebih detail namun kompleks.
-
-```javascript
-// Expo - Mudah dan langsung
-import * as Camera from "expo-camera";
-
-// React Native CLI - Perlu instalasi tambahan
-import { RNCamera } from "react-native-camera";
+```bash
+npx create-expo-app qr-code-reader
+cd qr-code-reader
 ```
 
-### Slide 6: Pengenalan Expo Camera
+Perintah ini akan membuat project Expo baru dengan nama `qr-code-reader` menggunakan template default.
 
-Expo Camera adalah library untuk mengakses kamera device dengan mudah. Mendukung foto, video, barcode scanning, dan face detection. Tersedia untuk iOS dan Android dengan API yang konsisten.
+#### 1.2 Bersihkan File Default (Opsional)
 
-### Slide 7: Instalasi dan Konfigurasi expo-camera
+Jika ingin memulai dari awal tanpa example code:
 
-Instalasi menggunakan npm atau yarn, kemudian import ke dalam project.
-
-```javascript
-// Instalasi via terminal
-npx expo install expo-camera
-
-// Import di file komponen
-import { Camera, CameraType } from 'expo-camera';
-import { useState, useRef } from 'react';
+```bash
+npm run reset-project
 ```
 
-### Slide 8: Permission Handling untuk Kamera
+Atau hapus manual folder `app-example` dan isi folder `app` jika sudah ada.
 
-Permission harus diminta sebelum mengakses kamera untuk keamanan dan privacy user.
+---
 
-```javascript
-import { Camera } from "expo-camera";
+### Langkah 2: Install Dependencies
+
+#### 2.1 Install Package yang Diperlukan
+
+Jalankan perintah berikut untuk menginstall dependencies:
+
+```bash
+npm install expo-camera
+```
+
+**Penjelasan Dependencies:**
+- `expo-camera`: Library untuk akses kamera dan scanning barcode/QR code
+
+#### 2.2 Verifikasi Instalasi
+
+Pastikan `package.json` sudah berisi dependencies berikut:
+
+```json
+{
+  "dependencies": {
+    "expo": "~54.0.31",
+    "expo-camera": "^17.0.10",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
+  }
+}
+```
+
+---
+
+### Langkah 3: Konfigurasi Root Layout
+
+#### 3.1 Buat File `app/_layout.tsx`
+
+Buat folder `app` (jika belum ada) dan file `_layout.tsx` di dalamnya:
+
+```bash
+mkdir -p app
+touch app/_layout.tsx
+```
+
+#### 3.2 Isi File `app/_layout.tsx`
+
+Buka file `app/_layout.tsx` dan masukkan kode berikut:
+
+```tsx
+import { Stack } from "expo-router";
+
+export default function RootLayout() {
+  return (
+    <Stack>
+      <Stack.Screen
+        name="index"
+        options={{
+          title: "QR Code Reader",
+          headerShown: false,
+        }}
+      />
+    </Stack>
+  );
+}
+```
+
+**Penjelasan Kode:**
+- `Stack`: Komponen navigasi dari expo-router untuk stack navigation
+- `Stack.Screen`: Mendefinisikan screen dalam stack
+- `name="index"`: Merujuk ke file `index.tsx` di folder yang sama
+- `headerShown: false`: Menyembunyikan header untuk tampilan fullscreen
+
+---
+
+### Langkah 4: Membuat QR Scanner Screen
+
+#### 4.1 Buat File `app/index.tsx`
+
+```bash
+touch app/index.tsx
+```
+
+#### 4.2 Import Dependencies
+
+Buka file `app/index.tsx` dan mulai dengan import yang diperlukan:
+
+```tsx
+// Import Camera dan CameraView dari expo-camera untuk akses kamera
+import { Camera, CameraView } from "expo-camera";
+// Import React hooks untuk state management dan side effects
 import { useEffect, useState } from "react";
-
-const CameraScreen = () => {
-  const [hasPermission, setHasPermission] = useState(null);
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === "granted");
-    })();
-  }, []);
-
-  if (hasPermission === null) {
-    return <Text>Meminta permission...</Text>;
-  }
-  if (hasPermission === false) {
-    return <Text>Akses kamera ditolak</Text>;
-  }
-
-  return <Camera style={{ flex: 1 }} />;
-};
+// Import komponen React Native UI
+import {
+  Alert,
+  Button,
+  Keyboard,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 ```
 
-### Slide 9: Struktur Dasar Komponen Camera
+#### 4.3 Buat Component dan State Management
 
-Komponen Camera memerlukan style dengan flex untuk menampilkan preview kamera.
+Lanjutkan dengan membuat component dan state:
 
-```javascript
-import { Camera, CameraType } from "expo-camera";
-import { StyleSheet, View } from "react-native";
+```tsx
+export default function Index() {
+  // State untuk status izin kamera (null = requesting, true = granted, false = denied)
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  
+  // State untuk tracking apakah QR code sudah dipindai
+  const [scanned, setScanned] = useState(false);
+  
+  // State untuk menyimpan data QR code yang dipindai
+  const [scannedData, setScannedData] = useState<string>("");
+  
+  // State untuk menandai apakah data adalah URL
+  const [isUrl, setIsUrl] = useState(false);
+  
+  // State untuk menyimpan nama user
+  const [userName, setUserName] = useState<string>("");
+  
+  // State untuk mengontrol visibility modal input nama
+  const [showNameInput, setShowNameInput] = useState(false);
+  
+  // State untuk menyimpan URL yang menunggu POST request
+  const [pendingUrl, setPendingUrl] = useState<string>("");
+```
 
-const CameraScreen = () => {
-  const [type, setType] = useState(CameraType.back);
+#### 4.4 Buat Fungsi Validasi URL
 
+Tambahkan fungsi untuk memvalidasi apakah string adalah URL valid:
+
+```tsx
+  // Fungsi untuk validasi URL
+  const isValidUrl = (string: string) => {
+    try {
+      // Coba parse string sebagai URL
+      const url = new URL(string);
+      // Return true hanya jika protokol http atau https
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch (_) {
+      // Jika parsing gagal, bukan URL valid
+      return false;
+    }
+  };
+```
+
+**Penjelasan:**
+- Menggunakan constructor `URL()` untuk parsing
+- Hanya menerima URL dengan protokol `http://` atau `https://`
+- Return `false` jika parsing error (bukan URL)
+
+#### 4.5 Buat Fungsi untuk Mengirim POST Request
+
+Tambahkan fungsi untuk mengirim nama ke URL:
+
+```tsx
+  // Fungsi async untuk mengirim POST request
+  const sendNameToUrl = async (url: string, name: string) => {
+    try {
+      // Kirim POST request dengan fetch API
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name }),
+      });
+
+      // Cek apakah request berhasil
+      if (response.ok) {
+        Alert.alert(
+          "Success",
+          `Nama "${name}" berhasil dikirim ke:\n${url}`
+        );
+      } else {
+        Alert.alert(
+          "Error",
+          `Gagal mengirim nama.\nStatus: ${response.status}`
+        );
+      }
+    } catch (error) {
+      // Tangani error jika request gagal
+      Alert.alert("Error", `Tidak dapat mengirim data ke:\n${url}`);
+    }
+  };
+```
+
+**Penjelasan:**
+- Menggunakan `fetch()` API untuk HTTP request
+- Method: `POST`
+- Header: `Content-Type: application/json`
+- Body: JSON dengan format `{ "name": "nama user" }`
+- Menampilkan alert success atau error
+
+#### 4.6 Buat Fungsi untuk Menampilkan Modal Input
+
+Tambahkan fungsi untuk menampilkan dan handle modal:
+
+```tsx
+  // Fungsi untuk menampilkan modal input nama
+  const promptForNameAndSend = (url: string) => {
+    setPendingUrl(url);
+    setUserName("");
+    setShowNameInput(true);
+  };
+
+  // Fungsi untuk handle pengiriman nama
+  const handleSendName = () => {
+    if (userName && userName.trim() !== "") {
+      Keyboard.dismiss();
+      setShowNameInput(false);
+      sendNameToUrl(pendingUrl, userName.trim());
+    } else {
+      Alert.alert("Error", "Silakan masukkan nama yang valid");
+    }
+  };
+
+  // Fungsi untuk cancel input nama
+  const handleCancelNameInput = () => {
+    Keyboard.dismiss();
+    setShowNameInput(false);
+    setUserName("");
+  };
+```
+
+**Penjelasan:**
+- `promptForNameAndSend`: Menyimpan URL dan menampilkan modal
+- `handleSendName`: Validasi input dan kirim POST request
+- `handleCancelNameInput`: Tutup modal dan reset input
+
+#### 4.7 Request Permission Kamera
+
+Tambahkan `useEffect` untuk meminta izin kamera:
+
+```tsx
+  // useEffect dijalankan sekali saat component mount
+  useEffect(() => {
+    const getCameraPermissions = async () => {
+      // Request permission kamera
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      // Update state permission
+      setHasPermission(status === "granted");
+    };
+
+    getCameraPermissions();
+  }, []); // Empty array = hanya run sekali
+```
+
+**Penjelasan:**
+- `useEffect` dengan dependency array kosong `[]` = run sekali saat mount
+- `requestCameraPermissionsAsync()`: Meminta izin kamera dari sistem
+- Status disimpan di state `hasPermission`
+
+#### 4.8 Buat Handler untuk Scan Barcode
+
+Tambahkan fungsi yang dipanggil saat QR code terdeteksi:
+
+```tsx
+  // Handler yang dipanggil saat barcode terdeteksi
+  const handleBarCodeScanned = ({
+    type,
+    data,
+  }: {
+    type: string;
+    data: string;
+  }) => {
+    // Tandai sebagai sudah scan
+    setScanned(true);
+    // Simpan data yang dipindai
+    setScannedData(data);
+    // Cek apakah data adalah URL
+    const urlDetected = isValidUrl(data);
+    setIsUrl(urlDetected);
+
+    // Jika URL, tanya user apakah mau kirim nama
+    if (urlDetected) {
+      Alert.alert(
+        "QR Code Berhasil Dipindai!",
+        `URL Terdeteksi: ${data}\n\nApakah Anda ingin mengirim nama Anda ke URL ini?`,
+        [
+          { text: "Batal", style: "cancel" },
+          { text: "Kirim Nama", onPress: () => promptForNameAndSend(data) },
+        ]
+      );
+    } else {
+      // Jika bukan URL, tampilkan data saja
+      Alert.alert("QR Code Berhasil Dipindai!", `Tipe: ${type}\nData: ${data}`, [
+        { text: "OK" },
+      ]);
+    }
+  };
+```
+
+**Penjelasan:**
+- Fungsi ini otomatis dipanggil oleh `CameraView` saat QR code terdeteksi
+- Parameter `type`: jenis barcode (qr, pdf417, dll)
+- Parameter `data`: isi dari QR code
+- Menampilkan alert berbeda untuk URL dan non-URL
+
+#### 4.9 Render UI - Permission States
+
+Tambahkan conditional render untuk status permission:
+
+```tsx
+  // Tampilkan loading jika masih requesting permission
+  if (hasPermission === null) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>Meminta izin kamera...</Text>
+      </View>
+    );
+  }
+
+  // Tampilkan error jika permission ditolak
+  if (hasPermission === false) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>Tidak ada akses ke kamera</Text>
+      </View>
+    );
+  }
+```
+
+#### 4.10 Render UI - Main Screen
+
+Tambahkan render untuk main screen dengan camera:
+
+```tsx
+  // Main render - tampilkan camera dan UI
   return (
     <View style={styles.container}>
-      <Camera style={styles.camera} type={type}>
-        {/* UI overlay di sini */}
-      </Camera>
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  camera: {
-    flex: 1,
-  },
-});
-```
-
-### Slide 10: Props dan Methods Camera API
-
-Camera component memiliki berbagai props untuk konfigurasi dan methods untuk kontrol.
-
-```javascript
-<Camera
-  type={CameraType.back} // back atau front
-  flashMode={FlashMode.off} // on, off, auto
-  zoom={0} // 0 sampai 1
-  ratio="16:9" // aspect ratio
-  onCameraReady={() => console.log("Camera ready")}
-  onMountError={(error) => console.log(error)}
-/>
-```
-
-### Slide 11: Capture Photo: Konsep dan Implementasi
-
-Menggunakan ref untuk mengakses camera instance dan method takePictureAsync untuk capture.
-
-```javascript
-import { Camera } from "expo-camera";
-import { useRef, useState } from "react";
-import { Button, Image } from "react-native";
-
-const CameraScreen = () => {
-  const cameraRef = useRef(null);
-  const [photo, setPhoto] = useState(null);
-
-  const takePicture = async () => {
-    if (cameraRef.current) {
-      const options = { quality: 0.5, base64: true };
-      const data = await cameraRef.current.takePictureAsync(options);
-      setPhoto(data.uri);
-      console.log("Photo URI:", data.uri);
-    }
-  };
-
-  return (
-    <>
-      <Camera style={{ flex: 1 }} ref={cameraRef} />
-      <Button title="Take Photo" onPress={takePicture} />
-      {photo && (
-        <Image source={{ uri: photo }} style={{ width: 200, height: 200 }} />
-      )}
-    </>
-  );
-};
-```
-
-### Slide 12: Camera Types: Front vs Back Camera
-
-Toggle antara kamera depan dan belakang menggunakan state.
-
-```javascript
-import { Camera, CameraType } from "expo-camera";
-import { useState } from "react";
-import { Button } from "react-native";
-
-const CameraScreen = () => {
-  const [type, setType] = useState(CameraType.back);
-
-  const toggleCameraType = () => {
-    setType((current) =>
-      current === CameraType.back ? CameraType.front : CameraType.back
-    );
-  };
-
-  return (
-    <>
-      <Camera style={{ flex: 1 }} type={type} />
-      <Button title="Flip Camera" onPress={toggleCameraType} />
-    </>
-  );
-};
-```
-
-### Slide 13: Pengenalan expo-image-picker
-
-Image Picker memungkinkan user memilih foto/video dari galeri atau mengambil foto baru tanpa membuat komponen kamera sendiri.
-
-### Slide 14: Mengakses Galeri vs Kamera Langsung
-
-Image Picker menyediakan dua metode utama: launchImageLibraryAsync untuk galeri dan launchCameraAsync untuk kamera.
-
-```javascript
-import * as ImagePicker from "expo-image-picker";
-
-// Akses Galeri
-const pickImage = async () => {
-  let result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    allowsEditing: true,
-    aspect: [4, 3],
-    quality: 1,
-  });
-
-  if (!result.canceled) {
-    console.log(result.assets[0].uri);
-  }
-};
-
-// Akses Kamera
-const takePhoto = async () => {
-  let result = await ImagePicker.launchCameraAsync({
-    allowsEditing: true,
-    aspect: [1, 1],
-    quality: 0.5,
-  });
-
-  if (!result.canceled) {
-    console.log(result.assets[0].uri);
-  }
-};
-```
-
-### Slide 15: Permission untuk Media Library
-
-Request permission sebelum mengakses galeri atau kamera melalui Image Picker.
-
-```javascript
-import * as ImagePicker from "expo-image-picker";
-import { useEffect } from "react";
-
-const App = () => {
-  useEffect(() => {
-    (async () => {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        alert("Permission ditolak!");
-      }
-
-      const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
-      if (cameraStatus.status !== "granted") {
-        alert("Camera permission ditolak!");
-      }
-    })();
-  }, []);
-};
-```
-
-### Slide 16: ImagePicker Options dan Konfigurasi
-
-Berbagai opsi untuk mengkustomisasi behavior image picker.
-
-```javascript
-const options = {
-  mediaTypes: ImagePicker.MediaTypeOptions.All, // All, Images, Videos
-  allowsEditing: true, // Enable crop/edit
-  aspect: [16, 9], // Aspect ratio untuk editing
-  quality: 0.8, // 0 sampai 1
-  allowsMultipleSelection: false, // Multiple selection
-  selectionLimit: 3, // Limit jika multiple
-  base64: false, // Include base64 data
-  exif: false, // Include EXIF metadata
-};
-
-const result = await ImagePicker.launchImageLibraryAsync(options);
-```
-
-### Slide 17: Image Compression dan Quality Control
-
-Mengatur kualitas gambar untuk menghemat storage dan bandwidth.
-
-```javascript
-const pickImageWithCompression = async () => {
-  let result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    quality: 0.5, // 50% quality - file lebih kecil
-    allowsEditing: true,
-    aspect: [4, 3],
-  });
-
-  if (!result.canceled) {
-    const asset = result.assets[0];
-    console.log("Original size:", asset.fileSize);
-    console.log("URI:", asset.uri);
-    console.log("Width:", asset.width);
-    console.log("Height:", asset.height);
-  }
-};
-```
-
-### Slide 18: Handling Selected Images
-
-Menyimpan dan menampilkan gambar yang dipilih user.
-
-```javascript
-import { useState } from "react";
-import { Image, Button, View } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-
-const ImagePickerExample = () => {
-  const [selectedImage, setSelectedImage] = useState(null);
-
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri);
-    }
-  };
-
-  return (
-    <View>
-      <Button title="Pilih Gambar" onPress={pickImage} />
-      {selectedImage && (
-        <Image
-          source={{ uri: selectedImage }}
-          style={{ width: 300, height: 300 }}
-        />
-      )}
-    </View>
-  );
-};
-```
-
-### Slide 19: Pengenalan Expo Location
-
-Expo Location API menyediakan akses ke GPS device untuk mendapatkan koordinat, tracking posisi, dan geocoding.
-
-### Slide 20: Permission Handling untuk Lokasi
-
-Request location permission dengan granularity yang berbeda.
-
-```javascript
-import * as Location from "expo-location";
-import { useEffect, useState } from "react";
-
-const LocationScreen = () => {
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
-
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission ditolak");
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-    })();
-  }, []);
-
-  return <Text>{errorMsg ? errorMsg : JSON.stringify(location)}</Text>;
-};
-```
-
-### Slide 21: getCurrentPositionAsync: Mendapatkan Lokasi Saat Ini
-
-Method untuk mendapatkan posisi device satu kali.
-
-```javascript
-import * as Location from "expo-location";
-
-const getLocation = async () => {
-  try {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      console.log("Permission ditolak");
-      return;
-    }
-
-    let location = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.High,
-    });
-
-    console.log("Latitude:", location.coords.latitude);
-    console.log("Longitude:", location.coords.longitude);
-    console.log("Altitude:", location.coords.altitude);
-    console.log("Speed:", location.coords.speed);
-    console.log("Heading:", location.coords.heading);
-  } catch (error) {
-    console.error(error);
-  }
-};
-```
-
-### Slide 22: watchPositionAsync: Tracking Real-time Location
-
-Monitoring perubahan lokasi secara real-time untuk aplikasi tracking.
-
-```javascript
-import * as Location from "expo-location";
-import { useEffect, useState } from "react";
-
-const LocationTracker = () => {
-  const [location, setLocation] = useState(null);
-
-  useEffect(() => {
-    let subscription;
-
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") return;
-
-      subscription = await Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.High,
-          timeInterval: 5000, // Update setiap 5 detik
-          distanceInterval: 10, // atau setiap 10 meter
-        },
-        (newLocation) => {
-          setLocation(newLocation);
-          console.log("Updated:", newLocation.coords);
-        }
-      );
-    })();
-
-    return () => {
-      if (subscription) {
-        subscription.remove();
-      }
-    };
-  }, []);
-
-  return (
-    <Text>
-      {location
-        ? `Lat: ${location.coords.latitude}, Lng: ${location.coords.longitude}`
-        : "Loading..."}
-    </Text>
-  );
-};
-```
-
-### Slide 23: Accuracy Levels pada Location API
-
-Berbagai level akurasi untuk menyeimbangkan presisi dan battery consumption.
-
-```javascript
-import * as Location from "expo-location";
-
-// Level akurasi yang tersedia:
-const accuracyLevels = {
-  lowest: Location.Accuracy.Lowest, // ~3000m
-  low: Location.Accuracy.Low, // ~1000m
-  balanced: Location.Accuracy.Balanced, // ~100m
-  high: Location.Accuracy.High, // ~10m
-  highest: Location.Accuracy.Highest, // <10m
-  bestForNavigation: Location.Accuracy.BestForNavigation, // optimal untuk navigasi
-};
-
-// Contoh penggunaan
-const getAccurateLocation = async () => {
-  const location = await Location.getCurrentPositionAsync({
-    accuracy: Location.Accuracy.BestForNavigation,
-  });
-  console.log(location);
-};
-```
-
-### Slide 24: Reverse Geocoding dengan Expo Location
-
-Mengkonversi koordinat GPS menjadi alamat yang dapat dibaca manusia.
-
-```javascript
-import * as Location from "expo-location";
-
-const reverseGeocode = async (latitude, longitude) => {
-  try {
-    const address = await Location.reverseGeocodeAsync({
-      latitude,
-      longitude,
-    });
-
-    if (address.length > 0) {
-      const location = address[0];
-      console.log("Street:", location.street);
-      console.log("City:", location.city);
-      console.log("Region:", location.region);
-      console.log("Country:", location.country);
-      console.log("Postal Code:", location.postalCode);
-
-      return `${location.street}, ${location.city}, ${location.country}`;
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-// Contoh penggunaan
-const fullAddress = await reverseGeocode(-6.2088, 106.8456); // Jakarta
-```
-
-### Slide 25: Pengenalan Expo Notifications
-
-Expo Notifications memungkinkan pengiriman notifikasi lokal dan push notifications ke device user.
-
-### Slide 26: Local Notifications vs Push Notifications
-
-Local notifications dijadwalkan dari aplikasi itu sendiri, sedangkan push notifications dikirim dari server eksternal.
-
-```javascript
-import * as Notifications from "expo-notifications";
-
-// Local Notification - dari aplikasi sendiri
-const scheduleLocalNotification = async () => {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "Local Notification",
-      body: "Ini notifikasi dari aplikasi lokal",
-    },
-    trigger: { seconds: 5 },
-  });
-};
-
-// Push Notification - dari server (perlu token)
-const getPushToken = async () => {
-  const token = await Notifications.getExpoPushTokenAsync();
-  console.log("Push Token:", token.data);
-  // Kirim token ini ke server
-};
-```
-
-### Slide 27: Scheduling Notifications
-
-Menjadwalkan notifikasi untuk waktu tertentu atau berulang.
-
-```javascript
-import * as Notifications from "expo-notifications";
-
-// Konfigurasi handler
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
-
-// Notifikasi dalam 10 detik
-const scheduleNotification = async () => {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "Reminder",
-      body: "Jangan lupa minum air!",
-      data: { userId: 123 },
-    },
-    trigger: { seconds: 10 },
-  });
-};
-
-// Notifikasi berulang setiap hari jam 9 pagi
-const scheduleDailyNotification = async () => {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "Good Morning!",
-      body: "Waktunya memulai hari",
-    },
-    trigger: {
-      hour: 9,
-      minute: 0,
-      repeats: true,
-    },
-  });
-};
-
-// Cancel notifikasi
-const cancelNotification = async (notificationId) => {
-  await Notifications.cancelScheduledNotificationAsync(notificationId);
-};
-
-// Cancel semua
-const cancelAll = async () => {
-  await Notifications.cancelAllScheduledNotificationsAsync();
-};
-```
-
-### Slide 28: Expo Media Library: Akses File Media Device
-
-Media Library memberikan akses ke foto dan video yang tersimpan di device.
-
-```javascript
-import * as MediaLibrary from "expo-media-library";
-import { useEffect, useState } from "react";
-
-const MediaLibraryExample = () => {
-  const [albums, setAlbums] = useState([]);
-  const [photos, setPhotos] = useState([]);
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status !== "granted") {
-        alert("Permission ditolak");
-        return;
-      }
-
-      // Ambil album
-      const albumList = await MediaLibrary.getAlbumsAsync();
-      setAlbums(albumList);
-
-      // Ambil 20 foto terbaru
-      const media = await MediaLibrary.getAssetsAsync({
-        first: 20,
-        mediaType: "photo",
-        sortBy: "creationTime",
-      });
-      setPhotos(media.assets);
-    })();
-  }, []);
-
-  return (
-    <View>
-      <Text>Total Albums: {albums.length}</Text>
-      <Text>Recent Photos: {photos.length}</Text>
-    </View>
-  );
-};
-
-// Simpan foto ke galeri
-const saveToGallery = async (uri) => {
-  try {
-    const asset = await MediaLibrary.createAssetAsync(uri);
-    await MediaLibrary.createAlbumAsync("My App Photos", asset, false);
-    console.log("Saved to gallery");
-  } catch (error) {
-    console.error(error);
-  }
-};
-```
-
-### Slide 29: Best Practices Permission Handling
-
-Strategi menangani permission dengan user experience yang baik.
-
-```javascript
-import * as Location from "expo-location";
-import { Alert } from "react-native";
-
-const requestLocationWithFallback = async () => {
-  // 1. Cek status permission saat ini
-  const { status: existingStatus } =
-    await Location.getForegroundPermissionsAsync();
-
-  let finalStatus = existingStatus;
-
-  // 2. Request jika belum granted
-  if (existingStatus !== "granted") {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    finalStatus = status;
-  }
-
-  // 3. Handle rejection dengan informasi jelas
-  if (finalStatus !== "granted") {
-    Alert.alert(
-      "Permission Diperlukan",
-      "Aplikasi memerlukan akses lokasi untuk fitur ini. Silakan aktifkan di Settings.",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Open Settings", onPress: () => Linking.openSettings() },
-      ]
-    );
-    return false;
-  }
-
-  return true;
-};
-
-// Best practice: Request permission saat dibutuhkan, bukan di awal
-const handleLocationFeature = async () => {
-  const hasPermission = await requestLocationWithFallback();
-  if (hasPermission) {
-    // Lanjutkan fitur lokasi
-    const location = await Location.getCurrentPositionAsync({});
-    console.log(location);
-  }
-};
-```
-
-### Slide 30: Studi Kasus: Aplikasi dengan Multiple Device Features
-
-Contoh aplikasi lengkap yang mengintegrasikan kamera, lokasi, dan notifikasi.
-
-```javascript
-import { useState, useEffect } from "react";
-import { View, Button, Text, Image } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import * as Location from "expo-location";
-import * as Notifications from "expo-notifications";
-
-const TravelJournalApp = () => {
-  const [photo, setPhoto] = useState(null);
-  const [location, setLocation] = useState(null);
-
-  useEffect(() => {
-    // Setup notification handler
-    Notifications.setNotificationHandler({
-      handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: false,
-      }),
-    });
-
-    // Request permissions
-    (async () => {
-      await ImagePicker.requestCameraPermissionsAsync();
-      await Location.requestForegroundPermissionsAsync();
-      await Notifications.requestPermissionsAsync();
-    })();
-  }, []);
-
-  const takePhotoWithLocation = async () => {
-    // 1. Ambil foto
-    const result = await ImagePicker.launchCameraAsync({
-      quality: 0.7,
-      allowsEditing: true,
-    });
-
-    if (result.canceled) return;
-
-    // 2. Dapatkan lokasi
-    const currentLocation = await Location.getCurrentPositionAsync({});
-
-    // 3. Reverse geocode untuk alamat
-    const address = await Location.reverseGeocodeAsync({
-      latitude: currentLocation.coords.latitude,
-      longitude: currentLocation.coords.longitude,
-    });
-
-    // 4. Simpan data
-    setPhoto(result.assets[0].uri);
-    setLocation({
-      coords: currentLocation.coords,
-      address: address[0],
-    });
-
-    // 5. Kirim notifikasi sukses
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "Foto Tersimpan!",
-        body: `Lokasi: ${address[0].city}, ${address[0].country}`,
-      },
-      trigger: { seconds: 1 },
-    });
-  };
-
-  return (
-    <View style={{ padding: 20 }}>
-      <Button
-        title="Ambil Foto dengan Lokasi"
-        onPress={takePhotoWithLocation}
+      {/* Camera View - fullscreen */}
+      <CameraView
+        // Disable scanning jika sudah scan (undefined = disabled)
+        onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+        // Setting untuk tipe barcode yang di-scan
+        barcodeScannerSettings={{
+          barcodeTypes: ["qr", "pdf417"],
+        }}
+        // Style untuk fullscreen
+        style={StyleSheet.absoluteFillObject}
       />
 
-      {photo && (
-        <>
-          <Image
-            source={{ uri: photo }}
-            style={{ width: 300, height: 300, marginTop: 20 }}
-          />
-          {location && (
-            <View style={{ marginTop: 10 }}>
-              <Text>Latitude: {location.coords.latitude.toFixed(4)}</Text>
-              <Text>Longitude: {location.coords.longitude.toFixed(4)}</Text>
-              <Text>Lokasi: {location.address.street}</Text>
-              <Text>
-                {location.address.city}, {location.address.country}
-              </Text>
-            </View>
+      {/* Overlay - UI di atas camera */}
+      <View style={styles.overlay}>
+        {/* Kotak putih sebagai guide scanning */}
+        <View style={styles.scanArea} />
+        {/* Text instruksi */}
+        <Text style={styles.instructionText}>
+          Arahkan kamera ke QR code
+        </Text>
+      </View>
+
+      {/* Result Container - tampil setelah scan */}
+      {scanned && (
+        <View style={styles.resultContainer}>
+          <Text style={styles.resultLabel}>Data yang Dipindai:</Text>
+          <Text style={styles.resultText}>{scannedData}</Text>
+
+          {/* Tombol kirim nama - hanya untuk URL */}
+          {isUrl && (
+            <Button
+              title="Kirim Nama ke URL"
+              onPress={() => promptForNameAndSend(scannedData)}
+              color="#4CAF50"
+            />
           )}
-        </>
+
+          {/* Tombol scan ulang */}
+          <View style={{ marginTop: 10 }}>
+            <Button
+              title="Pindai Lagi"
+              onPress={() => setScanned(false)}
+              color="#2196F3"
+            />
+          </View>
+        </View>
       )}
+
+      {/* Modal untuk input nama */}
+      <Modal
+        visible={showNameInput}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={handleCancelNameInput}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={handleCancelNameInput}
+        >
+          <TouchableOpacity activeOpacity={1} onPress={() => {}}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Masukkan Nama Anda</Text>
+              <Text style={styles.modalSubtitle}>
+                Silakan masukkan nama Anda untuk dikirim ke server:
+              </Text>
+              <TextInput
+                style={styles.nameInput}
+                placeholder="Nama Anda"
+                value={userName}
+                onChangeText={setUserName}
+                autoFocus={true}
+                onSubmitEditing={handleSendName}
+              />
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.cancelButton]}
+                  onPress={handleCancelNameInput}
+                >
+                  <Text style={styles.cancelButtonText}>Batal</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.sendButton]}
+                  onPress={handleSendName}
+                >
+                  <Text style={styles.sendButtonText}>Kirim</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
-};
-
-export default TravelJournalApp;
+}
 ```
 
----
+**Penjelasan Komponen:**
+- `CameraView`: Komponen kamera dari expo-camera
+- `onBarcodeScanned`: Callback saat barcode terdeteksi
+- `barcodeTypes`: Tipe barcode yang akan di-detect
+- `overlay`: Layer UI di atas kamera
+- `resultContainer`: Card hasil scan (conditional)
+- `Modal`: Modal custom untuk input nama (cross-platform)
 
-## Quiz Pilihan Berganda
+#### 4.11 Tambahkan Styling
 
----
+Terakhir, tambahkan styles untuk semua komponen:
 
-## Soal 1
-
-Apa method yang digunakan untuk meminta permission kamera di Expo?
-
-A. `Camera.getPermission()`
-B. `Camera.requestCameraPermissionsAsync()`
-C. `Camera.askPermission()`
-D. `Camera.requestPermission()`
-
-**Jawaban: B**
-
----
-
-## Soal 2
-
-Apa perbedaan utama antara `launchImageLibraryAsync` dan `launchCameraAsync` pada ImagePicker?
-
-A. Keduanya sama saja
-B. `launchImageLibraryAsync` membuka galeri, `launchCameraAsync` membuka kamera
-C. `launchImageLibraryAsync` untuk video, `launchCameraAsync` untuk foto
-D. `launchImageLibraryAsync` lebih cepat daripada `launchCameraAsync`
-
-**Jawaban: B**
-
----
-
-## Soal 3
-
-Apa fungsi dari property `quality` pada ImagePicker options?
-
-A. Mengatur resolusi layar
-B. Mengatur kecepatan loading gambar
-C. Mengatur kompresi gambar dari 0 (terkompresi maksimal) sampai 1 (kualitas penuh)
-D. Mengatur filter warna gambar
-
-**Jawaban: C**
-
----
-
-## Soal 4
-
-Method apa yang digunakan untuk mendapatkan lokasi GPS device satu kali?
-
-A. `Location.getLocationAsync()`
-B. `Location.getCurrentPositionAsync()`
-C. `Location.fetchLocation()`
-D. `Location.getPosition()`
-
-**Jawaban: B**
-
----
-
-## Soal 5
-
-Apa perbedaan antara `getCurrentPositionAsync` dan `watchPositionAsync`?
-
-A. Tidak ada perbedaan, keduanya sama
-B. `getCurrentPositionAsync` mendapatkan lokasi sekali, `watchPositionAsync` memantau lokasi secara real-time
-C. `watchPositionAsync` lebih akurat daripada `getCurrentPositionAsync`
-D. `getCurrentPositionAsync` hanya untuk Android, `watchPositionAsync` untuk iOS
-
-**Jawaban: B**
-
----
-
-## Soal 6
-
-Apa fungsi dari Reverse Geocoding pada Location API?
-
-A. Mengubah alamat menjadi koordinat GPS
-B. Mengubah koordinat GPS menjadi alamat yang dapat dibaca manusia
-C. Menghitung jarak antara dua titik
-D. Mengecek apakah GPS aktif atau tidak
-
-**Jawaban: B**
-
----
-
-## Soal 7
-
-Apa perbedaan antara Local Notifications dan Push Notifications?
-
-A. Local notifications dari aplikasi lokal, push notifications dari server eksternal
-B. Local notifications untuk iOS, push notifications untuk Android
-C. Push notifications lebih cepat daripada local notifications
-D. Tidak ada perbedaan signifikan
-
-**Jawaban: A**
-
----
-
-## Soal 8
-
-Bagaimana cara menjadwalkan notifikasi yang berulang setiap hari?
-
-A. Menggunakan `trigger: { seconds: 86400 }`
-B. Menggunakan `trigger: { hour: 9, minute: 0, repeats: true }`
-C. Menggunakan `trigger: { daily: true }`
-D. Menggunakan `trigger: { interval: 'daily' }`
-
-**Jawaban: B**
-
----
-
-## Soal 9
-
-Apa level akurasi tertinggi pada Location API?
-
-A. `Location.Accuracy.High`
-B. `Location.Accuracy.Maximum`
-C. `Location.Accuracy.BestForNavigation`
-D. `Location.Accuracy.Perfect`
-
-**Jawaban: C**
-
----
-
-## Soal 10
-
-Kapan waktu yang tepat untuk request permission menurut best practices?
-
-A. Saat aplikasi pertama kali dibuka
-B. Saat aplikasi di-install
-C. Saat fitur yang memerlukan permission akan digunakan
-D. Setelah user login
-
-**Jawaban: C**
-
----
-
-**Selamat! Anda telah menyelesaikan materi Multimedia dan Device API** 🎉
-
-````
+```tsx
+// Definisi styles dengan StyleSheet
+const styles = StyleSheet.create({
+  // Container utama - fullscreen hitam
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#000",
+  },
+  // Style untuk text
+  text: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  // Overlay di atas camera
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  // Kotak putih guide scanning
+  scanArea: {
+    width: 250,
+    height: 250,
+    borderWidth: 2,
+    borderColor: "#fff",
+    borderRadius: 10,
+    backgroundColor: "transparent",
+  },
+  // Text instruksi
+  instructionText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 20,
+    textAlign: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    padding: 10,
+    borderRadius: 5,
+  },
+  // Container hasil scan di bawah
+  resultContainer: {
+    position: "absolute",
+    bottom: 50,
+    left: 20,
+    right: 20,
+    backgroundColor: "rgba(255,255,255,0.95)",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  // Label "Data yang Dipindai:"
+  resultLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#333",
+  },
+  // Text data hasil scan
+  resultText: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  // Overlay modal - background semi-transparan
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  // Container konten modal
+  modalContent: {
+    backgroundColor: "#fff",
+    borderRadius: 15,
+    padding: 20,
+    width: 300,
+    alignItems: "stretch",
+  },
+  // Title modal
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  // Subtitle modal
+  modalSubtitle: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  // Input field nama
+  nameInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 20,
+    backgroundColor: "#f9f9f9",
+  },
+  // Container tombol modal
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  // Base style tombol
+  modalButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  // Tombol batal
+  cancelButton: {
+    backgroundColor: "#f0f0f0",
+  },
+  // Tombol kirim
+  sendButton: {
+    backgroundColor: "#4CAF50",
+  },
+  // Text tombol batal
+  cancelButtonText: {
+    color: "#333",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  // Text tombol kirim
+  sendButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+});
 ```
-````
+
+**Penjelasan Styles:**
+- Menggunakan `StyleSheet.create()` untuk performa lebih baik
+- `flex: 1`: Mengisi seluruh space yang tersedia
+- `position: "absolute"`: Positioning absolut untuk overlay
+- `rgba()`: Warna dengan transparency
+- Responsive dengan menggunakan relative units
+
+---
+
+### Langkah 5: Testing Aplikasi
+
+#### 5.1 Jalankan Development Server
+
+Di terminal, jalankan:
+
+```bash
+npx expo start
+```
+
+Atau:
+
+```bash
+npm start
+```
+
+#### 5.2 Pilih Platform Testing
+
+Setelah server running, Anda akan melihat QR code dan opsi:
+
+**Untuk Android:**
+```
+› Press a │ open Android
+```
+Tekan `a` untuk membuka di Android emulator/device
+
+**Untuk iOS:**
+```
+› Press i │ open iOS simulator
+```
+Tekan `i` untuk membuka di iOS simulator
+
+**Untuk Physical Device:**
+1. Install aplikasi **Expo Go** dari Play Store (Android) atau App Store (iOS)
+2. Scan QR code yang muncul di terminal dengan Expo Go
+
+#### 5.3 Grant Camera Permission
+
+Saat aplikasi pertama kali dibuka:
+1. Popup permission akan muncul
+2. Tap **"Allow"** atau **"Izinkan"**
+3. Kamera akan langsung aktif
+
+#### 5.4 Test Scanning QR Code
+
+**Test dengan QR Code Non-URL:**
+1. Arahkan kamera ke QR code biasa
+2. Alert akan muncul menampilkan data
+3. Tap "OK"
+4. Tap "Pindai Lagi" untuk scan ulang
+
+**Test dengan QR Code URL:**
+1. Buat QR code yang berisi URL (contoh: `https://example.com/api/submit`)
+2. Arahkan kamera ke QR code tersebut
+3. Alert akan muncul: "Apakah Anda ingin mengirim nama Anda ke URL ini?"
+4. Tap "Kirim Nama"
+5. Modal input akan muncul
+6. Masukkan nama Anda
+7. Tap "Kirim"
+8. POST request akan dikirim ke URL tersebut
+9. Alert success/error akan muncul
+
+#### 5.5 Verifikasi POST Request
+
+Untuk memverifikasi bahwa POST request berhasil dikirim, Anda bisa:
+
+**Opsi 1: Menggunakan Server Test**
+Buat QR code dengan URL test endpoint seperti:
+- `https://webhook.site` (dapat melihat request yang masuk)
+- `https://httpbin.org/post` (echo POST request)
+
+**Opsi 2: Buat Server Sendiri**
+Buat simple server untuk testing:
+
+```javascript
+// server.js
+const express = require('express');
+const app = express();
+
+app.use(express.json());
+
+app.post('/api/submit', (req, res) => {
+  console.log('Received POST request:');
+  console.log('Body:', req.body);
+  res.json({ success: true, received: req.body });
+});
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+```
+
+Jalankan: `node server.js`
+
+Buat QR code dengan: `http://YOUR_IP:3000/api/submit`
+
+---
+
+## 🎯 Cara Kerja
+
+1. **Berikan Izin Kamera**: Aplikasi meminta akses kamera saat pertama kali dibuka
+2. **Pindai QR Code**: Arahkan kamera Anda ke QR code
+3. **Deteksi Otomatis**: Aplikasi otomatis mendeteksi dan memindai QR code
+4. **Cek URL**: Jika data yang dipindai adalah URL valid:
+   - Menampilkan alert menanyakan apakah Anda ingin mengirim nama Anda
+   - Membuka modal untuk input nama
+   - Mengirim POST request dengan nama Anda ke URL yang dipindai
+5. **Data Non-URL**: Jika bukan URL, menampilkan data dalam alert
+6. **Scan Ulang**: Tekan tombol "Tap to Scan Again" untuk memindai QR code lain
+
+### Format API Request
+
+Ketika URL dipindai dan nama dimasukkan, aplikasi mengirim:
+
+**Method**: `POST`  
+**Headers**: `Content-Type: application/json`  
+**Body**:
+```json
+{
+  "name": "Nama User"
+}
+```
+
+## 📁 Struktur Project
+
+
+```
+qr-code-reader/
+├── app/
+│   ├── _layout.tsx        # Root layout dengan navigasi
+│   └── index.tsx          # Screen utama QR scanner
+├── app-example/           # Contoh code dari template Expo
+├── assets/                # Gambar dan aset statis
+├── package.json           # Dependencies project
+├── tsconfig.json          # Konfigurasi TypeScript
+└── README.md              # File ini
+```
+
+## 🛠 Teknologi yang Digunakan
+
+- **React Native**: Pengembangan aplikasi mobile cross-platform
+- **Expo**: Framework dan tools pengembangan
+- **TypeScript**: JavaScript dengan type-safe
+- **expo-camera**: Akses kamera dan scanning barcode
+- **expo-router**: Routing berbasis file
+- **Fetch API**: HTTP POST requests
+
+## 💡 Komponen Utama
+
+### State Management
+- `hasPermission`: Status izin kamera
+- `scanned`: Melacak apakah QR code sudah dipindai
+- `scannedData`: Menyimpan data QR code yang dipindai
+- `isUrl`: Menandai apakah data yang dipindai adalah URL valid
+- `userName`: Menyimpan input nama pengguna
+- `showNameInput`: Mengontrol visibilitas modal
+- `pendingUrl`: Menyimpan URL yang menunggu POST request
+
+### Fungsi Utama
+- `isValidUrl()`: Memvalidasi apakah data yang dipindai adalah URL HTTP/HTTPS yang valid
+- `sendNameToUrl()`: Mengirim POST request dengan nama pengguna
+- `promptForNameAndSend()`: Menampilkan modal input nama
+- `handleBarCodeScanned()`: Memproses data barcode yang dipindai
+
+## 📝 Struktur Code
+
+Seluruh aplikasi terdapat dalam `app/index.tsx` dengan:
+- **Imports**: Komponen React Native dan library Expo
+- **Component**: Komponen fungsional utama dengan hooks
+- **State**: Multiple useState hooks untuk state aplikasi
+- **Functions**: Helper functions untuk validasi URL dan HTTP requests
+- **Effects**: useEffect untuk request izin kamera
+- **Render**: Conditional rendering berdasarkan permissions dan state scan
+- **Styles**: StyleSheet untuk semua komponen UI
+
+## 🔒 Permissions
+
+Aplikasi memerlukan:
+- **Izin Kamera**: Diperlukan untuk memindai QR codes
+- Permission diminta secara otomatis saat pertama kali dibuka
+- Jika ditolak, aplikasi menampilkan pesan error
+
+## 🤝 Contributing
+
+Silakan fork project ini dan submit pull request untuk perbaikan apapun.
+
+## 📄 License
+
+Project ini adalah open source dan tersedia di bawah MIT License.
+
+## 👨‍💻 Catatan Development
+
+- Aplikasi menggunakan alternatif `Alert.prompt()` (custom modal) untuk kompatibilitas cross-platform
+- Mendukung QR codes dan barcode PDF417
+- Hanya URL HTTP dan HTTPS yang dianggap valid
+- Camera view mengisi seluruh layar untuk UX yang lebih baik
+- Scanning dinonaktifkan setelah scan pertama sampai tombol "Scan Again" ditekan
+
+## 🐛 Troubleshooting
+
+**Kamera tidak berfungsi:**
+- Periksa izin kamera di pengaturan device
+- Pastikan Anda testing di physical device (kamera mungkin tidak berfungsi di simulator)
+
+**POST request gagal:**
+- Verifikasi QR code berisi URL HTTP/HTTPS yang valid
+- Cek apakah server dapat diakses
+- Pastikan server menerima POST requests dengan JSON body
+
+**Modal tidak muncul:**
+- Masalah ini sudah diperbaiki untuk berfungsi di iOS dan Android
+- Menggunakan custom modal sebagai pengganti Alert.prompt()
+
+---
+
+**Selamat Coding! 🎉**
+
+Dibuat dengan ❤️ menggunakan Expo dan React Native
