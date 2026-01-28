@@ -144,7 +144,7 @@
 - Aktivitas: Presentasi progress, review project.
 - Asesmen: Penilaian project berjalan.
 - Slides :
-  - https://fast-ibbi.github.io/kamis-vii-p1/pertemuan-15
+  - [Expense Tracker App Tutorial](./slides/expense-tracker-app.md)
 
 ### Pertemuan 16
 
