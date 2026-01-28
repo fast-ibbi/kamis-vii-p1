@@ -25,6 +25,8 @@ Setelah pertemuan ini, mahasiswa diharapkan mampu:
 - Menerapkan teknik optimasi untuk meningkatkan kinerja aplikasi
 - Memahami best practices dalam pengembangan aplikasi React Native
 
+---
+
 ## **Mengapa Optimasi Penting dalam Mobile Development**
 
 Optimasi penting karena:
@@ -34,6 +36,8 @@ Optimasi penting karena:
 - Aplikasi lambat = user uninstall (53% user meninggalkan app yang load > 3 detik)
 - Rating app store dipengaruhi performa
 - Battery drain berdampak pada user satisfaction
+
+---
 
 ## **Dampak Aplikasi Lambat terhadap User Experience**
 
@@ -51,6 +55,8 @@ Contoh metrik ideal:
 - Frame rate: 60 FPS
 - Memory usage: optimal sesuai device
 
+---
+
 ## **Metrik Kinerja Utama (FPS, Memory Usage, Load Time)**
 
 Metrik yang perlu dimonitor:
@@ -61,7 +67,11 @@ Metrik yang perlu dimonitor:
 4. **Bundle Size**: Ukuran file aplikasi
 5. **API Response Time**: Kecepatan fetch data
 
+---
+
 ### Debugging di React Native
+
+---
 
 ## **Pengenalan Debugging dalam React Native**
 
@@ -71,6 +81,8 @@ Debugging adalah proses menemukan dan memperbaiki bug dalam kode. Dalam React Na
 - Native layer (Android/iOS)
 - Network layer
 - State management layer
+
+---
 
 ## **Tools Debugging yang Tersedia di Expo**
 
@@ -83,6 +95,8 @@ Tools debugging di Expo:
 5. Expo Go App
 6. Error Boundaries
 7. Network inspector
+
+---
 
 ## **Expo Developer Menu (Shake Gesture)**
 
@@ -98,6 +112,8 @@ Menu options:
 - Debug Remote JS: Buka Chrome DevTools
 - Show Performance Monitor: Lihat FPS dan memory
 - Toggle Element Inspector: Inspect UI elements
+
+---
 
 ## **Remote Debugging dengan Chrome DevTools**
 
@@ -118,6 +134,8 @@ function calculateTotal(items) {
   return items.reduce((sum, item) => sum + item.price, 0);
 }
 ```
+
+---
 
 ## **Console Logging Best Practices**
 
@@ -150,6 +168,8 @@ const logger = {
 };
 ```
 
+---
+
 ## **React DevTools untuk Inspeksi Komponen**
 
 React DevTools memungkinkan inspeksi component tree dan props/state:
@@ -179,6 +199,8 @@ function UserProfile({ user }) {
 }
 ```
 
+---
+
 ## **Expo Go App untuk Testing Real-time**
 
 Expo Go memungkinkan testing langsung di device:
@@ -196,6 +218,8 @@ LogBox.ignoreLogs(["Warning: componentWillReceiveProps", "Setting a timer"]);
 // Ignore all logs (not recommended)
 LogBox.ignoreAllLogs();
 ```
+
+---
 
 ## **Error Boundaries dalam React Native**
 
@@ -250,6 +274,8 @@ function App() {
 }
 ```
 
+---
+
 ## **Menangani Runtime Errors**
 
 ```javascript
@@ -282,11 +308,13 @@ ErrorUtils.setGlobalHandler((error, isFatal) => {
   if (isFatal) {
     Alert.alert(
       "Unexpected error occurred",
-      `Error: ${error.name} ${error.message}`
+      `Error: ${error.name} ${error.message}`,
     );
   }
 });
 ```
+
+---
 
 ## **Network Debugging dan Inspeksi API Calls**
 
@@ -333,7 +361,11 @@ axios.interceptors.response.use((response) => {
 });
 ```
 
+---
+
 ### Optimasi Kinerja
+
+---
 
 ## **Prinsip Dasar Optimasi React Native**
 
@@ -357,9 +389,11 @@ performance.mark("screen-render-end");
 performance.measure(
   "screen-render",
   "screen-render-start",
-  "screen-render-end"
+  "screen-render-end",
 );
 ```
+
+---
 
 ## **Component Re-rendering dan Cara Menghindarinya**
 
@@ -404,7 +438,7 @@ function ParentComponent() {
       name: "John",
       age: 30,
     }),
-    []
+    [],
   ); // Empty deps = create once
 
   return (
@@ -415,6 +449,8 @@ function ParentComponent() {
   );
 }
 ```
+
+---
 
 ## **React.memo untuk Optimasi Komponen**
 
@@ -467,9 +503,11 @@ const ExpensiveComponent = React.memo(
       prevProps.userId === nextProps.userId &&
       prevProps.data.length === nextProps.data.length
     );
-  }
+  },
 );
 ```
+
+---
 
 ## **useMemo dan useCallback Hooks**
 
@@ -516,7 +554,7 @@ function SearchScreen() {
       addToCart(productId);
       showNotification("Added to cart");
     },
-    [addToCart, showNotification]
+    [addToCart, showNotification],
   );
 
   return (
@@ -527,6 +565,8 @@ function SearchScreen() {
   );
 }
 ```
+
+---
 
 ## **Virtualized Lists (FlatList vs ScrollView)**
 
@@ -565,7 +605,7 @@ function GoodProductList({ products }) {
 function OptimizedProductList({ products }) {
   const renderItem = useCallback(
     ({ item }) => <ProductCard product={item} />,
-    []
+    [],
   );
 
   const keyExtractor = useCallback((item) => item.id.toString(), []);
@@ -579,6 +619,8 @@ function OptimizedProductList({ products }) {
   );
 }
 ```
+
+---
 
 ## **Optimasi FlatList dengan Props Khusus**
 
@@ -629,6 +671,8 @@ const ListItem = React.memo(({ item }) => {
 
 const ITEM_HEIGHT = 80;
 ```
+
+---
 
 ## **Image Optimization dan Caching**
 
@@ -697,6 +741,8 @@ function ProgressiveImage({ source, style }) {
 }
 ```
 
+---
+
 ## **Lazy Loading dan Code Splitting**
 
 ```javascript
@@ -750,6 +796,8 @@ async function loadFeature(featureName) {
 }
 ```
 
+---
+
 ## **Mengurangi Bundle Size Aplikasi**
 
 ```javascript
@@ -799,6 +847,8 @@ export const COLORS = { primary: '#007AFF' };
 // utils.js
 export const formatCurrency = (amount) => `$${amount.toFixed(2)}`;
 ```
+
+---
 
 ## **Async Storage Best Practices**
 
@@ -885,6 +935,8 @@ const cache = {
 await cache.set("user_data", userData, 30); // Cache 30 minutes
 const cachedData = await cache.get("user_data");
 ```
+
+---
 
 ## **Memory Leaks dan Cara Mencegahnya**
 
@@ -980,6 +1032,8 @@ function BetterComponent() {
 }
 ```
 
+---
+
 ## **Performance Monitoring dengan Expo**
 
 ```javascript
@@ -1006,7 +1060,7 @@ function HomeScreen({ navigation }) {
       performance.measure(
         "home-screen-duration",
         "home-screen-mount",
-        "home-screen-unmount"
+        "home-screen-unmount",
       );
     };
   }, []);
@@ -1018,7 +1072,7 @@ function HomeScreen({ navigation }) {
     performance.measure(
       "navigation-time",
       "navigation-start",
-      "navigation-end"
+      "navigation-end",
     );
   };
 
@@ -1037,7 +1091,7 @@ async function fetchWithPerformance(url) {
     performance.measure(
       `fetch-${url}`,
       `fetch-${url}-start`,
-      `fetch-${url}-end`
+      `fetch-${url}-end`,
     );
 
     return data;
@@ -1070,6 +1124,8 @@ const duration = metrics.endMeasure("heavy-computation");
 console.log(`Computation took ${duration}ms`);
 ```
 
+---
+
 ## **Profiling dengan React Native Performance Monitor**
 
 ```javascript
@@ -1086,7 +1142,7 @@ function onRenderCallback(
   baseDuration, // Estimated waktu tanpa memoization
   startTime,
   commitTime,
-  interactions
+  interactions,
 ) {
   console.log(`${id} (${phase}) took ${actualDuration}ms`);
 }
@@ -1125,7 +1181,7 @@ function usePerformanceTracking(componentName) {
     const duration = performance.now() - startTime.current;
 
     console.log(
-      `${componentName} render #${renderCount.current}: ${duration}ms`
+      `${componentName} render #${renderCount.current}: ${duration}ms`,
     );
 
     startTime.current = performance.now();
@@ -1139,6 +1195,8 @@ function MyComponent() {
   return <View>{/* component content */}</View>;
 }
 ```
+
+---
 
 ## **Common Performance Pitfalls**
 
@@ -1157,7 +1215,7 @@ function MyComponent() {
 // ✅ Solution: Extract dan memoize
 const renderItem = useCallback(
   ({ item }) => <ItemComponent item={item} onPress={handlePress} />,
-  [handlePress]
+  [handlePress],
 );
 
 // ❌ Pitfall 2: Heavy computation di render
@@ -1222,6 +1280,8 @@ const value = useMemo(() => ({ user, setUser }), [user]);
 return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 ```
 
+---
+
 ## **Best Practices Ringkasan**
 
 ```javascript
@@ -1271,6 +1331,8 @@ useEffect(() => {
   return () => subscription.unsubscribe();
 }, []);
 ```
+
+---
 
 ## **Checklist Optimasi Sebelum Release**
 
@@ -1332,6 +1394,8 @@ if (__DEV__) {
 }
 ```
 
+---
+
 ## **Studi Kasus: Before & After Optimization**
 
 ```javascript
@@ -1381,12 +1445,12 @@ const ProductCard = React.memo(({ product, onAddToCart }) => {
   // Compute once, memoize result
   const discount = useMemo(
     () => calculateDiscount(product),
-    [product.price, product.originalPrice]
+    [product.price, product.originalPrice],
   );
 
   const rating = useMemo(
     () => calculateAverageRating(product.reviews),
-    [product.reviews]
+    [product.reviews],
   );
 
   return (
@@ -1417,7 +1481,7 @@ function FastProductList({ products }) {
 
   const renderItem = useCallback(
     ({ item }) => <ProductCard product={item} onAddToCart={handleAddToCart} />,
-    [handleAddToCart]
+    [handleAddToCart],
   );
 
   const keyExtractor = useCallback((item) => item.id.toString(), []);
@@ -1457,7 +1521,11 @@ const ITEM_HEIGHT = 120;
 
 ---
 
+---
+
 ## Quiz Pilihan Berganda
+
+---
 
 ---
 
@@ -1474,6 +1542,8 @@ D. Ukuran layar device
 
 ---
 
+---
+
 ## Soal 2
 
 Bagaimana cara membuka Expo Developer Menu di device fisik?
@@ -1484,6 +1554,8 @@ C. Tekan tombol volume
 D. Swipe dari atas ke bawah
 
 **Jawaban: B**
+
+---
 
 ---
 
@@ -1500,6 +1572,8 @@ D. Mengurangi ukuran bundle
 
 ---
 
+---
+
 ## Soal 4
 
 Hook apa yang digunakan untuk memoize computed values yang expensive?
@@ -1510,6 +1584,8 @@ C. useMemo
 D. useRef
 
 **Jawaban: C**
+
+---
 
 ---
 
@@ -1526,6 +1602,8 @@ D. Tidak ada perbedaan signifikan
 
 ---
 
+---
+
 ## Soal 6
 
 Apa yang dimaksud dengan memory leak dalam aplikasi?
@@ -1536,6 +1614,8 @@ C. Memory tidak dilepaskan setelah tidak digunakan, menyebabkan memory usage ter
 D. Storage device penuh
 
 **Jawaban: C**
+
+---
 
 ---
 
@@ -1552,6 +1632,8 @@ D. Restart aplikasi
 
 ---
 
+---
+
 ## Soal 8
 
 Apa fungsi dari Error Boundary dalam React Native?
@@ -1565,6 +1647,8 @@ D. Memperbaiki error secara otomatis
 
 ---
 
+---
+
 ## Soal 9
 
 Props apa yang digunakan di FlatList untuk optimasi rendering?
@@ -1575,6 +1659,8 @@ C. `fastRender` dan `optimize`
 D. `quickLoad` dan `speedUp`
 
 **Jawaban: B**
+
+---
 
 ---
 

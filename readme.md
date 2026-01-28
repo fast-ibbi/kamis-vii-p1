@@ -152,3 +152,6 @@
 - OBE Outcome: Mahasiswa mengembangkan aplikasi komprehensif berbasis React Native.
 - Aktivitas: UAS berbasis praktik coding.
 - Asesmen: Proyek aplikasi mobile.
+
+[Soal UAS Teori](soal-uas-teori.md)
+[Soal UAS Praktik](soal-uas-praktik.md)
