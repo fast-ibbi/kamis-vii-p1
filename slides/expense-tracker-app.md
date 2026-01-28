@@ -78,14 +78,7 @@ export interface Expense {
 }
 
 // Array kategori default yang tersedia di aplikasi
-export const DEFAULT_CATEGORIES = [
-  "Makanan",
-  "Transportasi",
-  "Belanja",
-  "Tagihan",
-  "Hiburan",
-  "Lainnya",
-] as const;
+export const DEFAULT_CATEGORIES = [] as const;
 
 // Type alias untuk kategori
 export type CategoryType = string;
@@ -110,8 +103,6 @@ export const saveExpenses = async (expenses: Expense[]): Promise<void> => {
   try {
     // Konversi array objek ke JSON string
     const jsonValue = JSON.stringify(expenses);
-    // Simpan ke AsyncStorage dengan key yang sudah ditentukan
-    await AsyncStorage.setItem(EXPENSES_KEY, jsonValue);
   } catch (error) {
     console.error("Error saving expenses:", error);
     throw error;
@@ -121,8 +112,6 @@ export const saveExpenses = async (expenses: Expense[]): Promise<void> => {
 // Fungsi untuk memuat semua transaksi dari AsyncStorage
 export const loadExpenses = async (): Promise<Expense[]> => {
   try {
-    // Ambil data JSON dari AsyncStorage
-    const jsonValue = await AsyncStorage.getItem(EXPENSES_KEY);
     if (jsonValue != null) {
       // Parse JSON string menjadi array objek
       const expenses = JSON.parse(jsonValue);
@@ -580,7 +569,7 @@ Lanjutkan di `app/index.tsx`:
                 balance < 0 && styles.negativeBalance,
               ]}
             >
-              {formatRupiah(balance)}
+              {formatRupiah(0)}
             </Text>
           </View>
         </View>
@@ -624,7 +613,6 @@ Lanjutkan di `app/index.tsx`:
               style={styles.searchInput}
               placeholder="🔍 Cari transaksi..."
               value={searchQuery}
-              onChangeText={handleSearch}
             />
           </View>
 
@@ -1180,13 +1168,12 @@ const styles = StyleSheet.create({
     color: "#f44336",
   },
   deleteButton: {
-    backgroundColor: "#f44336",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 5,
   },
   deleteButtonText: {
-    color: "#fff",
+    color: "#000",
     fontSize: 12,
     fontWeight: "600",
   },
