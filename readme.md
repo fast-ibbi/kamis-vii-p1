@@ -154,4 +154,4 @@
 - Asesmen: Proyek aplikasi mobile.
 
 [Soal UAS Teori](soal-uas-teori.md)
-[Soal UAS Praktik](soal-uas-praktik.md)
+[Soal UAS Praktik](soal-uas-praktek.md)
